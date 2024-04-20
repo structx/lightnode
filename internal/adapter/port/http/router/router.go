@@ -33,13 +33,13 @@ func New(logger *zap.Logger) chi.Router {
 	for _, c := range cc {
 
 		if r0, ok := c.(controller.V0); ok {
-			handler := r0.RegisterRoutesV0()
-			r.Mount("/", handler)
+			h := r0.RegisterRoutesV0()
+			r.Mount("/", h)
 		}
 
 		if r1, ok := c.(controller.V1); ok {
-			handler := r1.RegisterRoutesV1()
-			v1.Mount("/", handler)
+			h := r1.RegisterRoutesV1()
+			v1.Mount("/", h)
 		}
 	}
 
