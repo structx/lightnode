@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/trevatk/k2/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/adapter/setup"
 )
 
 // New

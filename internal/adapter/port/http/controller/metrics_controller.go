@@ -1,5 +1,5 @@
 package controller
 
-import "github.com/trevatk/k2/internal/adapter/setup"
+import "github.com/trevatk/olivia/internal/adapter/setup"
 
 func InvokeMetricsController(cfg *setup.Config) {}

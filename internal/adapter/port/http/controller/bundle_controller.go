@@ -21,7 +21,10 @@ func NewBundle(logger *zap.Logger) *Bundle {
 
 // RegisterRoutesV0
 func (b *Bundle) RegisterRoutesV0() http.Handler {
+
 	r := chi.NewRouter()
+
+	r.Get("/health", b.Health)
 
 	return r
 }

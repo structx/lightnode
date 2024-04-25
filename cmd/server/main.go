@@ -10,11 +10,11 @@ import (
 
 	"github.com/hashicorp/raft"
 
-	"github.com/trevatk/k2/internal/adapter/logging"
-	"github.com/trevatk/k2/internal/adapter/port/http/controller"
-	"github.com/trevatk/k2/internal/adapter/port/http/server"
-	r "github.com/trevatk/k2/internal/adapter/port/raft"
-	"github.com/trevatk/k2/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/adapter/logging"
+	"github.com/trevatk/olivia/internal/adapter/port/http/controller"
+	"github.com/trevatk/olivia/internal/adapter/port/http/server"
+	r "github.com/trevatk/olivia/internal/adapter/port/raft"
+	"github.com/trevatk/olivia/internal/adapter/setup"
 )
 
 func main() {

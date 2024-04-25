@@ -9,3 +9,8 @@ type V0 interface {
 type V1 interface {
 	RegisterRoutesV1() http.Handler
 }
+
+// V1P
+type V1P interface {
+	RegisterRoutesV1P() http.Handler
+}
