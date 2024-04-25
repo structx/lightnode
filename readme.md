@@ -1,1 +1,1 @@
-# fullnode
+# lightnode

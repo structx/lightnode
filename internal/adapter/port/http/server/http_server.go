@@ -1,16 +1,19 @@
 package server
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 	"time"
 
-	"github.com/trevatk/olivia/internal/adapter/setup"
+	"github.com/trevatk/go-pkg/domain"
 )
 
 // New
-func New(cfg *setup.Config, handler http.Handler) *http.Server {
+func New(cfg domain.Config, handler http.Handler) *http.Server {
+	scfg := cfg.GetServer()
 	return &http.Server{
-		Addr:         cfg.Server.ListenAddr,
+		Addr:         net.JoinHostPort(scfg.BindAddr, fmt.Sprintf("%d", scfg.Ports.HTTP)),
 		Handler:      handler,
 		ReadTimeout:  time.Second * 15,
 		WriteTimeout: time.Second * 15,

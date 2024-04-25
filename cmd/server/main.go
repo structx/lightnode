@@ -10,21 +10,29 @@ import (
 
 	"github.com/hashicorp/raft"
 
-	"github.com/trevatk/olivia/internal/adapter/logging"
-	"github.com/trevatk/olivia/internal/adapter/port/http/controller"
+	"github.com/trevatk/go-pkg/adapter/logging"
+	"github.com/trevatk/go-pkg/adapter/port/raftfx"
+	"github.com/trevatk/go-pkg/adapter/setup"
+	"github.com/trevatk/go-pkg/adapter/storage/kv"
+	pkgdomain "github.com/trevatk/go-pkg/domain"
+	"github.com/trevatk/go-pkg/util/decode"
+
+	"github.com/trevatk/olivia/internal/adapter/port/http/router"
 	"github.com/trevatk/olivia/internal/adapter/port/http/server"
-	r "github.com/trevatk/olivia/internal/adapter/port/raft"
-	"github.com/trevatk/olivia/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/core/chain"
+	"github.com/trevatk/olivia/internal/core/domain"
 )
 
 func main() {
 	fx.New(
-		fx.Provide(setup.New),
-		fx.Invoke(setup.DecodeConfigFromEnv),
+		fx.Provide(fx.As(setup.New, fx.As(new(pkgdomain.Config)))),
+		fx.Invoke(decode.ConfigFromEnv),
 		fx.Provide(logging.New),
-		fx.Provide(r.New),
+		fx.Provide(fx.Annotate(kv.NewPebble, fx.As(new(pkgdomain.KV)))),
+		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain), fx.As(new(raft.FSM))))),
+		fx.Provide(fx.Annotate(router.New, fx.As(new(http.Handler)))),
+		fx.Provide(raftfx.New),
 		fx.Provide(server.New),
-		fx.Invoke(controller.InvokeMetricsController),
 		fx.Invoke(registerHooks),
 	).Run()
 }
