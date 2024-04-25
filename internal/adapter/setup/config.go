@@ -10,28 +10,30 @@ import (
 
 // Config
 type Config struct {
-	Logger Logger `hcl:"log,block"`
-	Chain  Chain  `hcl:"chain,block"`
-	Server Server `hcl:"server,block"`
-	Raft   Raft   `hcl:"raft,block"`
+	Logger        Logger        `hcl:"log,block"`
+	Chain         Chain         `hcl:"chain,block"`
+	Server        Server        `hcl:"server,block"`
+	Raft          Raft          `hcl:"raft,block"`
+	MessageBroker MessageBroker `hcl:"message_broker,block"`
 }
 
 // New
 func New() *Config {
 	return &Config{
-		Logger: Logger{},
-		Chain:  Chain{},
-		Server: Server{},
-		Raft:   Raft{},
+		Logger:        Logger{},
+		Chain:         Chain{},
+		Server:        Server{},
+		Raft:          Raft{},
+		MessageBroker: MessageBroker{},
 	}
 }
 
 // DecodeConfigFromEnv
 func DecodeConfigFromEnv(cfg *Config) (*Config, error) {
 
-	cfgPath := os.Getenv("__CONFIG")
+	cfgPath := os.Getenv("DSERVICE_CONFIG")
 	if cfgPath == "" {
-		return nil, errors.New("$__CONFIG must be set")
+		return nil, errors.New("$DSERVICE_CONFIG must be set")
 	}
 
 	err := hclsimple.DecodeFile(cfgPath, nil, &cfg)

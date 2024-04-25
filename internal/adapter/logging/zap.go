@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
-	"github.com/trevatk/k2/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/adapter/setup"
 )
 
 // New

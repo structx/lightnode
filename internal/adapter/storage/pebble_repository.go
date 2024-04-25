@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/cockroachdb/pebble"
-	"github.com/trevatk/k2/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/adapter/setup"
 )
 
 // PebbleDB

@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 	"moul.io/chizap"
 
-	"github.com/trevatk/k2/internal/adapter/port/http/controller"
+	"github.com/trevatk/olivia/internal/adapter/port/http/controller"
 )
 
 // New

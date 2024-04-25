@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
-	"github.com/trevatk/k2/internal/adapter/setup"
+	"github.com/trevatk/olivia/internal/adapter/setup"
 )
 
 // New

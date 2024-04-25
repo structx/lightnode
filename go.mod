@@ -1,4 +1,4 @@
-module github.com/trevatk/k2
+module github.com/trevatk/olivia
 
 go 1.22.2
 
@@ -9,11 +9,11 @@ require (
 	github.com/hashicorp/hcl/v2 v2.20.1
 	github.com/hashicorp/raft v1.6.1
 	github.com/hashicorp/raft-boltdb v0.0.0-20231211162105-6c830fa4535e
+	github.com/trevatk/go-pkg v0.0.4
 	go.uber.org/fx v1.21.0
 	go.uber.org/multierr v1.10.0
-	go.uber.org/zap v1.26.0
+	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.63.2
-	google.golang.org/protobuf v1.33.0
 	moul.io/chizap v1.0.3
 )
 
@@ -66,4 +66,5 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.14.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240227224415-6ceb2ff114de // indirect
+	google.golang.org/protobuf v1.33.0 // indirect
 )

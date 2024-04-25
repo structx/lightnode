@@ -6,16 +6,8 @@ import (
 	"sync"
 
 	"github.com/hashicorp/raft"
-	"github.com/trevatk/k2/internal/core/domain"
+	"github.com/trevatk/olivia/internal/core/domain"
 )
-
-// implementation of a blockchain with hashicorp raft
-// as a consensus algorithm. Due to the fast paced nature
-// of the raft consensus algorithm messages can be added and
-// deleted frequently when a term is increased or decreased.
-//
-// proving it important to have a temporary location to storage
-// blocks before appending to chain.
 
 type simpleChain struct {
 	mtx sync.RWMutex
