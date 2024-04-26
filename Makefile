@@ -1,4 +1,7 @@
 
+build image:
+	docker build -t trevatk/olivia:v0.0.1 .
+
 deps:
 	go mod tidy
 	go mod vendor

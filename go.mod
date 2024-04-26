@@ -5,7 +5,7 @@ go 1.22.2
 require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/hashicorp/raft v1.6.1
-	github.com/trevatk/go-pkg v0.0.5-alpha-1
+	github.com/trevatk/go-pkg v0.0.7
 	go.uber.org/fx v1.21.0
 	go.uber.org/multierr v1.10.0
 	go.uber.org/zap v1.27.0

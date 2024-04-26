@@ -25,11 +25,11 @@ import (
 
 func main() {
 	fx.New(
-		fx.Provide(fx.As(setup.New, fx.As(new(pkgdomain.Config)))),
+		fx.Provide(fx.Annotate(setup.New, fx.As(new(pkgdomain.Config)))),
 		fx.Invoke(decode.ConfigFromEnv),
 		fx.Provide(logging.New),
 		fx.Provide(fx.Annotate(kv.NewPebble, fx.As(new(pkgdomain.KV)))),
-		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain), fx.As(new(raft.FSM))))),
+		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)), fx.As(new(raft.FSM)))),
 		fx.Provide(fx.Annotate(router.New, fx.As(new(http.Handler)))),
 		fx.Provide(raftfx.New),
 		fx.Provide(server.New),

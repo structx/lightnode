@@ -1,45 +1,99 @@
 
-job "level0" {
+job "olivia" {
     datacenters = ["dc1"]
     type = "service"
 
-    group "structx" {
+    group "blockchain" {
         count = 1
 
         network {
             mode = "bridge"
 
-            port "metrics" {
-                to = 2112
-            }
-
             port "rpc" {}
 
             port "http" {}
         }
+        service {
+            name = "olivia-grpc"
+            port = "rpc"
 
-        template {
-            data =<< EOH
-            server {
-                bootstrap = true
-                listen_addr = ":{{ env 'NOMAD_PORT_http' }}"
+            provider = "consul"
+
+            connect {
+                sidecar_service {
+                    proxy {
+                        upstreams {
+                            destination_name = "mora"
+                            local_bind_port = 8081
+                        }
+                    }
+                }
             }
-            EOH
-            destination = "/etc/server/config.hcl"
+        }
+
+        service {
+            name = "olivia-api"
+            port = "http"
+
+            provider = "consul"
+
+            connect {
+                sidecar_service {}
+            }
+            
         }
 
         task "server" {
             driver = "docker"
 
             config {
-                image = ""
+                image = "trevatk/olivia:v0.0.1"
+                ports = ["http", "rpc"]
             }
 
             env {
-                __CONFIG = "/etc/server/config.hcl"
+                DSERVICE_CONFIG = "${NOMAD_TASK_DIR}/node.config.hcl"
             }
 
-            resources {}
+            template {
+                data = <<EOH
+server {
+    bind_addr = "0.0.0.0"
+
+    ports {
+        http = {{ env "NOMAD_PORT_http"}}
+        grpc = {{ env "NOMAD_PORT_rpc" }}
+    }
+}
+
+raft {
+    bootstrap = true
+    local_id = "12345566777434"
+    base_dir = "/opt/olivia/raft"
+}
+
+logger {
+    log_path = "/var/log/olivia/node.log"
+    log_level = "DEBUG"
+    raft_log_path = "/var/log/olivia"
+}
+
+chain {
+    base_dir = "/opt/olivia/data"
+}
+
+message_broker {
+    {{- range service "mora-rpc"}}
+    server_addr = "{{ .Address}}:{{ .Port}};{{- end}}"
+}
+                EOH
+                
+                destination = "local/node.config.hcl"
+                change_mode = "restart"
+                change_signal = "SIGTERM"
+            }
+
+
         }
     }
 }
