@@ -6,28 +6,37 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/trevatk/olivia/internal/core/domain"
 	"go.uber.org/multierr"
+
+	pkgdomain "github.com/trevatk/go-pkg/domain"
+	"github.com/trevatk/olivia/internal/core/domain"
 )
 
 var (
-	topics domain.Topics = []string{
-		"",
-	}
+	topics = []string{"test"}
 )
 
 // Bundle
 type Bundle struct {
 	c domain.Chain
 	r domain.Raft
-	m domain.MessageBroker
+	m pkgdomain.MessageBroker
+}
+
+// Bundle
+func NewBundle(chain domain.Chain, raft domain.Raft, messenger pkgdomain.MessageBroker) *Bundle {
+	return &Bundle{
+		c: chain,
+		r: raft,
+		m: messenger,
+	}
 }
 
 // Subscribe
 func (b *Bundle) Subscribe(ctx context.Context) error {
 
 	var result error
-	cs := make([]<-chan domain.Msg, 0)
+	cs := make([]<-chan pkgdomain.Envelope, 0)
 
 	for _, t := range topics {
 		ch, err := b.m.Subscribe(ctx, t)
@@ -53,7 +62,7 @@ func (b *Bundle) Subscribe(ctx context.Context) error {
 	return result
 }
 
-func (b *Bundle) subscriber(ctx context.Context, ch <-chan domain.Msg) error {
+func (b *Bundle) subscriber(ctx context.Context, ch <-chan pkgdomain.Envelope) error {
 
 	for {
 		select {
@@ -65,7 +74,7 @@ func (b *Bundle) subscriber(ctx context.Context, ch <-chan domain.Msg) error {
 				return nil
 			}
 
-			switch msg.Topic {
+			switch msg.GetTopic() {
 			case "":
 			default:
 				return errors.New("invalid topic")
@@ -74,11 +83,11 @@ func (b *Bundle) subscriber(ctx context.Context, ch <-chan domain.Msg) error {
 	}
 }
 
-func merge(ctx context.Context, cs ...<-chan domain.Msg) <-chan domain.Msg {
+func merge(ctx context.Context, cs ...<-chan pkgdomain.Envelope) <-chan pkgdomain.Envelope {
 
-	out := make(chan domain.Msg)
+	out := make(chan pkgdomain.Envelope)
 
-	output := func(c <-chan domain.Msg) {
+	output := func(c <-chan pkgdomain.Envelope) {
 		for n := range c {
 			select {
 			case <-ctx.Done():

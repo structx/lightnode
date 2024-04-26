@@ -6,31 +6,37 @@ import (
 	"sync"
 
 	"github.com/hashicorp/raft"
+
+	pkgdomain "github.com/trevatk/go-pkg/domain"
 	"github.com/trevatk/olivia/internal/core/domain"
 )
 
-type simpleChain struct {
+// SimpleChain
+type SimpleChain struct {
 	mtx sync.RWMutex
-	kv  domain.KV
+
+	kv pkgdomain.KV
 }
 
-var _ raft.FSM = (*simpleChain)(nil)
+// interface compliance
+var _ domain.Chain = (*SimpleChain)(nil)
+var _ raft.FSM = (*SimpleChain)(nil)
 
 // New
-func New(kv domain.KV) *simpleChain {
-	return &simpleChain{
+func New(kv pkgdomain.KV) *SimpleChain {
+	return &SimpleChain{
 		kv:  kv,
 		mtx: sync.RWMutex{},
 	}
 }
 
 // AddBlock
-func (c *simpleChain) AddBlock(data []byte) error {
+func (c *SimpleChain) AddBlock(data []byte) error {
 	return nil
 }
 
 // Apply
-func (c *simpleChain) Apply(log *raft.Log) interface{} {
+func (c *SimpleChain) Apply(log *raft.Log) interface{} {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
@@ -43,11 +49,11 @@ func (c *simpleChain) Apply(log *raft.Log) interface{} {
 }
 
 // Snapshot
-func (c *simpleChain) Snapshot() (raft.FSMSnapshot, error) {
+func (c *SimpleChain) Snapshot() (raft.FSMSnapshot, error) {
 	return nil, nil
 }
 
 // Restore
-func (c *simpleChain) Restore(snapshot io.ReadCloser) error {
+func (c *SimpleChain) Restore(snapshot io.ReadCloser) error {
 	return nil
 }
