@@ -1,3 +1,4 @@
+// Package server http server provider
 package server
 
 import (
@@ -9,7 +10,7 @@ import (
 	"github.com/trevatk/go-pkg/domain"
 )
 
-// New
+// New constructor
 func New(cfg domain.Config, handler http.Handler) *http.Server {
 	scfg := cfg.GetServer()
 	return &http.Server{

@@ -1,4 +1,5 @@
+// Package controller endpoint http endpoints
 package controller
 
-// Blocks
+// Blocks ...
 type Blocks struct{}

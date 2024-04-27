@@ -1,3 +1,4 @@
+// Package main entrypoint of application
 package main
 
 import (
@@ -40,7 +41,7 @@ func main() {
 func registerHooks(lc fx.Lifecycle, server *http.Server, raft *raft.Raft) error {
 	lc.Append(
 		fx.Hook{
-			OnStart: func(ctx context.Context) error {
+			OnStart: func(_ context.Context) error {
 
 				var result error
 

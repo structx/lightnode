@@ -1,3 +1,4 @@
+// Package service application logic and implementation
 package service
 
 import (
@@ -16,15 +17,15 @@ var (
 	topics = []string{"test"}
 )
 
-// Bundle
+// Bundle application service bundle
 type Bundle struct {
 	c domain.Chain
 	r domain.Raft
 	m pkgdomain.MessageBroker
 }
 
-// Bundle
-func NewBundle(chain domain.Chain, raft domain.Raft, messenger pkgdomain.MessageBroker) *Bundle {
+// New constructor
+func New(chain domain.Chain, raft domain.Raft, messenger pkgdomain.MessageBroker) *Bundle {
 	return &Bundle{
 		c: chain,
 		r: raft,
@@ -32,7 +33,7 @@ func NewBundle(chain domain.Chain, raft domain.Raft, messenger pkgdomain.Message
 	}
 }
 
-// Subscribe
+// Subscribe to all topics
 func (b *Bundle) Subscribe(ctx context.Context) error {
 
 	var result error
@@ -55,7 +56,7 @@ func (b *Bundle) Subscribe(ctx context.Context) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			b.subscriber(ctx, ch)
+			_ = b.subscriber(ctx, ch)
 		}()
 	}
 

@@ -1,3 +1,4 @@
+// Package router chi router provider
 package router
 
 import (
@@ -10,7 +11,7 @@ import (
 	pkgcontroller "github.com/trevatk/go-pkg/adapter/port/http/controller"
 )
 
-// New
+// New constructor
 func New(logger *zap.Logger) chi.Router {
 
 	r := chi.NewRouter()
