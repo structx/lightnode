@@ -1,4 +1,4 @@
 package service
 
-// Raft
+// Raft ...
 type Raft struct{}

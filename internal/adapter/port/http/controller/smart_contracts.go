@@ -1,4 +1,4 @@
 package controller
 
-// SmartContracts
+// SmartContracts ...
 type SmartContracts struct{}

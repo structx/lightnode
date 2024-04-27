@@ -1,4 +1,4 @@
 package domain
 
-// Raft
+// Raft service interface
 type Raft interface{}
