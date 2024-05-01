@@ -9,8 +9,8 @@ import (
 
 	"go.uber.org/multierr"
 
-	pkgdomain "github.com/trevatk/go-pkg/domain"
-	"github.com/trevatk/olivia/internal/core/domain"
+	pkgdomain "github.com/structx/go-pkg/domain"
+	"github.com/structx/lightnode/internal/core/domain"
 )
 
 var (

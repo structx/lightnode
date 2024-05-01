@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/trevatk/olivia/internal/core/domain"
-	"github.com/trevatk/olivia/internal/core/topic"
+	"github.com/structx/lightnode/internal/core/domain"
+	"github.com/structx/lightnode/internal/core/topic"
 )
 
 // SimpleService simple chain service
