@@ -1,13 +1,13 @@
-module github.com/trevatk/olivia
+module github.com/structx/lightnode
 
 go 1.22.2
 
 require (
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/hashicorp/raft v1.6.1
-	github.com/trevatk/go-pkg v0.0.9
-	go.uber.org/fx v1.21.0
-	go.uber.org/multierr v1.10.0
+	github.com/structx/go-pkg v0.0.2
+	go.uber.org/fx v1.21.1
+	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
 	google.golang.org/grpc v1.63.2
 	moul.io/chizap v1.0.3

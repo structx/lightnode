@@ -11,17 +11,17 @@ import (
 
 	"github.com/hashicorp/raft"
 
-	"github.com/trevatk/go-pkg/adapter/logging"
-	"github.com/trevatk/go-pkg/adapter/port/raftfx"
-	"github.com/trevatk/go-pkg/adapter/setup"
-	"github.com/trevatk/go-pkg/adapter/storage/kv"
-	pkgdomain "github.com/trevatk/go-pkg/domain"
-	"github.com/trevatk/go-pkg/util/decode"
+	"github.com/structx/go-pkg/adapter/logging"
+	"github.com/structx/go-pkg/adapter/port/raftfx"
+	"github.com/structx/go-pkg/adapter/setup"
+	"github.com/structx/go-pkg/adapter/storage/kv"
+	pkgdomain "github.com/structx/go-pkg/domain"
+	"github.com/structx/go-pkg/util/decode"
 
-	"github.com/trevatk/olivia/internal/adapter/port/http/router"
-	"github.com/trevatk/olivia/internal/adapter/port/http/server"
-	"github.com/trevatk/olivia/internal/core/chain"
-	"github.com/trevatk/olivia/internal/core/domain"
+	"github.com/structx/lightnode/internal/adapter/port/http/router"
+	"github.com/structx/lightnode/internal/adapter/port/http/server"
+	"github.com/structx/lightnode/internal/core/chain"
+	"github.com/structx/lightnode/internal/core/domain"
 )
 
 func main() {

@@ -10,9 +10,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pkgdomain "github.com/trevatk/go-pkg/domain"
-	pb "github.com/trevatk/go-pkg/proto/messaging/v1"
-	"github.com/trevatk/olivia/internal/core/domain"
+	pkgdomain "github.com/structx/go-pkg/domain"
+	pb "github.com/structx/go-pkg/proto/messaging/v1"
+	"github.com/structx/lightnode/internal/core/domain"
 )
 
 // GRPCServer protobuf implementation

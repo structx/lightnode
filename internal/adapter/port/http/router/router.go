@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 	"moul.io/chizap"
 
-	pkgcontroller "github.com/trevatk/go-pkg/adapter/port/http/controller"
+	pkgcontroller "github.com/structx/go-pkg/adapter/port/http/controller"
 )
 
 // New constructor
