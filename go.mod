@@ -4,7 +4,9 @@ go 1.22.2
 
 require (
 	github.com/go-chi/chi/v5 v5.0.12
+	github.com/go-chi/render v1.0.3
 	github.com/hashicorp/raft v1.6.1
+	github.com/structx/go-dpkg v0.0.9
 	github.com/structx/go-pkg v0.0.2
 	go.uber.org/fx v1.21.1
 	go.uber.org/multierr v1.11.0
@@ -17,6 +19,7 @@ require (
 	github.com/DataDog/zstd v1.5.2 // indirect
 	github.com/Jille/raft-grpc-transport v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.1 // indirect
+	github.com/ajg/form v1.5.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/armon/go-metrics v0.4.1 // indirect

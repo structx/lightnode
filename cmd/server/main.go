@@ -19,7 +19,6 @@ import (
 	"github.com/structx/go-pkg/util/decode"
 
 	"github.com/structx/lightnode/internal/adapter/port/http/router"
-	"github.com/structx/lightnode/internal/adapter/port/http/server"
 	"github.com/structx/lightnode/internal/core/chain"
 	"github.com/structx/lightnode/internal/core/domain"
 )
@@ -33,7 +32,6 @@ func main() {
 		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)), fx.As(new(raft.FSM)))),
 		fx.Provide(fx.Annotate(router.New, fx.As(new(http.Handler)))),
 		fx.Provide(raftfx.New),
-		fx.Provide(server.New),
 		fx.Invoke(registerHooks),
 	).Run()
 }

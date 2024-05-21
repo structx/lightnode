@@ -37,6 +37,9 @@ type Chain interface {
 	GetState() ChainState
 }
 
+// Iterator
+type Iterator interface{}
+
 // Block model
 type Block struct {
 	Hash          string        `json:"hash"`

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -14,10 +15,15 @@ type SimpleService struct {
 }
 
 // Query operation against blockchain
-func (ss *SimpleService) Query(payload []byte) (interface{}, error) {
-
+func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (interface{}, error) {
+	select {
+	case <-ctx.Done():
+		return nil, nil
+	default:
+		return nil, nil
+	}
 	var msg topic.SimpleChainQueryMsg
-	err := json.Unmarshal(payload, &msg)
+	err := json.Unmarshal(hash, &msg)
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal message %v", err)
 	}
@@ -28,4 +34,14 @@ func (ss *SimpleService) Query(payload []byte) (interface{}, error) {
 	}
 
 	return bl, nil
+}
+
+// PaginateBlocks
+func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int) error {
+	select {
+	case <-ctx.Done():
+		return nil
+	default:
+		return nil
+	}
 }
