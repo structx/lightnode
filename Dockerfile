@@ -13,7 +13,7 @@ FROM gcr.io/distroless/static-debian12
 
 COPY --from=builder /usr/bin/ /app/bin/
 
-VOLUME [ "/var/log/olivia", "/local/olivia", "/opt/olivia/raft", "/opt/olivia/data" ]
+VOLUME [ "/var/log/lightnode", "/local/lightnode", "/opt/lightnode/raft", "/opt/lightnode/data" ]
 
 EXPOSE 8080 50051
 

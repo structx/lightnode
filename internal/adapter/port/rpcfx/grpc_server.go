@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pkgdomain "github.com/structx/go-pkg/domain"
-	pb "github.com/structx/go-pkg/proto/messaging/v1"
+	pkgdomain "github.com/structx/go-dpkg/domain"
+	pb "github.com/structx/go-dpkg/proto/messaging/v1"
 	"github.com/structx/lightnode/internal/core/domain"
 )
 
@@ -20,7 +20,6 @@ type GRPCServer struct {
 	pb.UnimplementedMessagingServiceV1Server
 
 	log *zap.SugaredLogger
-	cfg pkgdomain.Messenger
 	ss  domain.SimpleService
 }
 
@@ -28,7 +27,6 @@ type GRPCServer struct {
 func New(config pkgdomain.Config, logger *zap.Logger) *GRPCServer {
 	return &GRPCServer{
 		log: logger.Sugar().Named("GrpcServer"),
-		cfg: config.GetMessenger(),
 	}
 }
 
@@ -45,7 +43,7 @@ func (g *GRPCServer) Subscribe(*pb.Subscription, pb.MessagingServiceV1_Subscribe
 }
 
 // RequestResponse handler
-func (g *GRPCServer) RequestResponse(_ context.Context, in *pb.Envelope) (*pb.Envelope, error) {
+func (g *GRPCServer) RequestResponse(ctx context.Context, in *pb.Envelope) (*pb.Envelope, error) {
 
 	var (
 		result interface{}
@@ -54,7 +52,7 @@ func (g *GRPCServer) RequestResponse(_ context.Context, in *pb.Envelope) (*pb.En
 
 	switch domain.Topic(in.Topic) {
 	case domain.SimpleChainQuery:
-		result, err = g.ss.Query(in.GetPayload())
+		result, err = g.ss.QueryBlockByHash(ctx, in.GetPayload())
 	}
 
 	if err != nil {

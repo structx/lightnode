@@ -1,5 +1,5 @@
 // Package router chi router provider
-package router
+package routerfx
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 	"moul.io/chizap"
 
-	pkgcontroller "github.com/structx/go-pkg/adapter/port/http/controller"
+	pkgcontroller "github.com/structx/go-dpkg/adapter/port/http/controller"
 )
 
 // New constructor
@@ -35,19 +35,16 @@ func New(logger *zap.Logger) chi.Router {
 
 	for _, c := range cc {
 
-		if c0, ok := c.(pkgcontroller.V0); ok {
-			h := c0.RegisterRoutesV0()
-			r.Mount("/", h)
+		if v0, ok := c.(pkgcontroller.V0); ok {
+			v0.RegisterRoutesV0(r)
 		}
 
 		if c1, ok := c.(pkgcontroller.V1); ok {
-			h := c1.RegisterRoutesV1()
-			v1.Mount("/", h)
+			c1.RegisterRoutesV1(v1)
 		}
 
 		if c1p, ok := c.(pkgcontroller.V1P); ok {
-			h := c1p.RegisterRoutesV1P()
-			v1p.Mount("/", h)
+			c1p.RegisterRoutesV1P(v1p)
 		}
 	}
 

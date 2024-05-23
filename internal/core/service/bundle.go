@@ -9,7 +9,7 @@ import (
 
 	"go.uber.org/multierr"
 
-	pkgdomain "github.com/structx/go-pkg/domain"
+	pkgdomain "github.com/structx/go-dpkg/domain"
 	"github.com/structx/lightnode/internal/core/domain"
 )
 

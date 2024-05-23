@@ -1,1 +1,5 @@
 vendor/
+*.log
+compose/raft
+compose/data
+compose/log

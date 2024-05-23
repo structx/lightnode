@@ -1,6 +1,6 @@
 
-build image:
-	docker build -t trevatk/olivia:v0.0.1 .
+build:
+	docker build -t structx/lightnode:latest .
 
 deps:
 	go mod tidy

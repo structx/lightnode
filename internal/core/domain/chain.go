@@ -22,7 +22,7 @@ type Chain interface {
 	// GetLatestBlock getter latest block
 	GetLatestBlock() Block
 	// GetBlockByHash retrieve block by hash
-	GetBlockByHash(string) (Block, error)
+	GetBlockByHash(string) (*Block, error)
 	// GetBlockHeight getter latest block height
 	GetBlockHeight() int
 	// ValidateBlock verify block is valid
@@ -35,10 +35,14 @@ type Chain interface {
 	AddTransaction(tx Transaction) error
 	// GetState getter current chain state
 	GetState() ChainState
+	//
+	NewSimpleIterator() Iterator
 }
 
 // Iterator
-type Iterator interface{}
+type Iterator interface {
+	Next() (*Block, error)
+}
 
 // Block model
 type Block struct {

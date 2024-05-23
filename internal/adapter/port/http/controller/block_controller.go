@@ -10,15 +10,16 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+
+	"go.uber.org/zap"
+
 	pkgcontroller "github.com/structx/go-dpkg/adapter/port/http/controller"
 	"github.com/structx/lightnode/internal/core/domain"
-	"go.uber.org/zap"
 )
 
 // Blocks ...
 type Blocks struct {
-	log *zap.SugaredLogger
-
+	log     *zap.SugaredLogger
 	service domain.SimpleService
 }
 
@@ -76,7 +77,7 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	hash := chi.URLParamFromCtx(ctx, "blockHash")
 
-	block, err := bc.service.Query([]byte(hash))
+	block, err := bc.service.QueryBlockByHash(ctx, []byte(hash))
 	if err != nil {
 
 	}
@@ -94,13 +95,39 @@ type BlockPartial struct {
 // PaginateParialsResponse
 type PaginatePartialsResponse struct {
 	Payload []*BlockPartial `json:"payload"`
-	Elapsed time.Time       `json:"elapsed"`
+	Elapsed int64           `json:"elapsed"`
+}
+
+// NewPaginatePartialsResponse
+func NewPaginatePartialsResponse(s []*domain.Block, start time.Time) *PaginatePartialsResponse {
+
+	bs := make([]*BlockPartial, 0, len(s))
+
+	for _, b := range s {
+		bs = append(bs, &BlockPartial{
+			Hash:      b.Hash,
+			Timestamp: b.Timestamp,
+		})
+	}
+
+	return &PaginatePartialsResponse{
+		Payload: bs,
+		Elapsed: time.Since(start).Milliseconds(),
+	}
+}
+
+// Render
+func (ppr *PaginatePartialsResponse) Render(w http.ResponseWriter, _ *http.Request) error {
+	w.WriteHeader(http.StatusAccepted)
+	return nil
 }
 
 // PaginatePartials
 func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()
+
+	start := time.Now()
 
 	limitStr := r.URL.Query().Get("limit")
 	offsetStr := r.URL.Query().Get("offset")
@@ -115,4 +142,13 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	bc.log.Debugf("PaginatePartials", "limit", limit, "offset", offset)
+
+	blockSlice, err := bc.service.PaginateBlocks(ctx, limit, offset)
+	if err != nil {
+		return
+	}
+
+	response := NewPaginatePartialsResponse(blockSlice, start)
+	_ = render.Render(w, r, response)
 }

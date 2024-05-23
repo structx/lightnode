@@ -1,0 +1,22 @@
+---
+version: '3.7'
+
+services:
+  lightnode:
+    image: structx/lightnode:latest
+    container_name: lightnode
+    environment:
+      - DSERVICE_CONFIG=/local/lightnode/server.config.hcl
+    ports:
+      - 8083:8080
+      - 50053:50051
+    volumes:
+      - ./data:/opt/lightnode/data
+      - ./log:/var/log/lightnode
+      - ./raft:/opt/lightnode/raft
+      - ./config/server.config.hcl:/local/lightnode/server.config.hcl
+
+networks:
+  default:
+    name: testnet
+    external: true

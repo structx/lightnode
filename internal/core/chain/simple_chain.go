@@ -10,7 +10,7 @@ import (
 
 	"github.com/hashicorp/raft"
 
-	pkgdomain "github.com/structx/go-pkg/domain"
+	pkgdomain "github.com/structx/go-dpkg/domain"
 	"github.com/structx/lightnode/internal/core/domain"
 )
 
@@ -63,10 +63,20 @@ func (c *SimpleChain) GetLatestBlock() domain.Block {
 }
 
 // GetBlockByHash ...
-func (c *SimpleChain) GetBlockByHash(_ string) (domain.Block, error) {
-	// TODO:
-	// implement function
-	return c.latestBlock, nil
+func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
+
+	blockbytes, err := c.kv.Get([]byte(hash))
+	if err != nil {
+		return nil, fmt.Errorf("failed get block from store %v", err)
+	}
+
+	var b domain.Block
+	err = json.Unmarshal(blockbytes, &b)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal block %v", err)
+	}
+
+	return &b, nil
 }
 
 // GetBlockHeight getter latest block height
