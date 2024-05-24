@@ -1,10 +1,6 @@
 
 terraform {
   required_providers {
-    docker = {
-      source  = "kreuzwerker/docker"
-      version = "3.0.2"
-    }
     kubernetes = {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0"
@@ -12,29 +8,8 @@ terraform {
   }
 }
 
-provider "docker" {
-    host = "unix:///var/run/docker.sock"
-
-    registry_auth {
-        address = "registry.structx.local"
-        config_file = pathexpand("~/.docker/config.json")
-    }
-}
-
 provider "kubernetes" {
     config_path = "~/.kube/config"
-}
-
-resource "docker_registry_image" "lightnode" {
-    name = docker_image.image.name
-    keep_remotely = true
-}
-
-resource "docker_image" "lightnode" {
-    name = "registry.structx.local/decentralized/lightnode:latest"
-    build {
-        context = "${path.module}/../"
-    }
 }
 
 resource "kubernetes_config_map" "lightnode" {
@@ -60,7 +35,7 @@ resource "kubernetes_persistent_volume_claim" "lightnode-data" {
                 storage = "5Gi"
             }
         }
-        volume_name = "${kubernetes_persistent_volume.lightnode.metedata.0.name}"
+        volume_name = "${kubernetes_persistent_volume.lightnode-data.metadata.0.name}"
     }
 }
 
@@ -76,7 +51,7 @@ resource "kubernetes_persistent_volume_claim" "lightnode-log" {
                 storage = "5Gi"
             }
         }
-        volume_name = "${kubernetes_persistent_volume.lightnode.metedata.0.name}"
+        volume_name = "${kubernetes_persistent_volume.lightnode-log.metadata.0.name}"
     }
 }
 
@@ -92,7 +67,7 @@ resource "kubernetes_persistent_volume_claim" "lightnode-raft" {
                 storage = "5Gi"
             }
         }
-        volume_name = "${kubernetes_persistent_volume.lightnode.metedata.0.name}"
+        volume_name = "${kubernetes_persistent_volume.lightnode-raft.metadata.0.name}"
     }
 }
 
@@ -200,7 +175,7 @@ resource "kubernetes_deployment" "lightnode" {
                 }
 
                 container {
-                    image = docker_image.image_name
+                    image = "decentralized/structx:latest"
                     name = "lightnode"
 
                     resources {
@@ -249,7 +224,7 @@ resource "kubernetes_deployment" "lightnode" {
                     liveness_probe {
                         http_get {
                             path = "/health"
-                            port = http
+                            port = "http"
                         }
                     }
                 }
