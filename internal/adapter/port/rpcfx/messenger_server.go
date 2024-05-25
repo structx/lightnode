@@ -1,5 +1,5 @@
 // Package rpc gRPC interface implementation
-package rpc
+package rpcfx
 
 import (
 	"context"

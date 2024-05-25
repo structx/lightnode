@@ -13,7 +13,6 @@ import (
 
 	"github.com/hashicorp/raft"
 
-	"github.com/structx/go-dpkg/adapter/logging"
 	"github.com/structx/go-dpkg/adapter/port/http/serverfx"
 	"github.com/structx/go-dpkg/adapter/port/raftfx"
 	"github.com/structx/go-dpkg/adapter/setup"
@@ -21,6 +20,7 @@ import (
 	pkgdomain "github.com/structx/go-dpkg/domain"
 	"github.com/structx/go-dpkg/util/decode"
 
+	"github.com/structx/lightnode/internal/adapter/logging"
 	"github.com/structx/lightnode/internal/adapter/port/http/routerfx"
 	"github.com/structx/lightnode/internal/core/chain"
 	"github.com/structx/lightnode/internal/core/domain"

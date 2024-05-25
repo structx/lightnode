@@ -1,5 +1,6 @@
 vendor/
 *.log
-compose/raft
-compose/data
-compose/log
+
+.terraform
+.terraform.lock.hcl
+terraform.tfstate*

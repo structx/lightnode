@@ -2,7 +2,6 @@ package controller
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 
@@ -56,18 +55,14 @@ func NewFetchTxResponse(tx *domain.Transaction) *FetchByHashResponse {
 
 // Fetch
 func (txc *Transactions) Fetch(w http.ResponseWriter, r *http.Request) {
-
-	ctx := r.Context()
-	start := time.Now()
-
-	txHash := chi.URLParamFromCtx(ctx, "txHash")
-
-	tx, err := txc.ss.ReadTxByHash(ctx, []byte(txHash))
-	if err != nil {
-		return
-	}
-
+	// TODO:
+	// implement handler
+	w.WriteHeader(http.StatusInternalServerError)
 }
 
 // Paginate
-func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {}
+func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
+	// TODO:
+	// implement handler
+	w.WriteHeader(http.StatusInternalServerError)
+}

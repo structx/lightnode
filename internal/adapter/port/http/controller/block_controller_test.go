@@ -57,7 +57,7 @@ func (suite *BlockControllerSuite) SetupTest() {
 		nil,
 	).Maybe()
 
-	suite.blocks = controller.NewBlocks(logger, mockService)
+	suite.blocks = controller.NewBlocks(logger, nil)
 }
 
 func (suite *BlockControllerSuite) TestFetchByHash() {

@@ -1,4 +1,4 @@
-package rpc
+package rpcfx
 
 // RaftServer
 type RaftServer struct{}
