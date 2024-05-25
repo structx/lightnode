@@ -1,6 +1,9 @@
 
 build:
-	docker build -t structx/lightnode:latest .
+	docker build -t registry.structx.local/structx/lightnode:v0.0.1 .
+
+push:
+	docker push registry.structx.local/structx/lightnode:v0.0.1
 
 deps:
 	go mod tidy
@@ -8,8 +11,3 @@ deps:
 
 lint:
 	golangci-lint run ./...
-
-rpc:
-	protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    proto/k2/v1/k2_service.proto
