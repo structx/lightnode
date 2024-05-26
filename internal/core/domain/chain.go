@@ -35,7 +35,7 @@ type Chain interface {
 	AddTransaction(tx Transaction) error
 	// GetState getter current chain state
 	GetState() ChainState
-	//
+	// NewSimpleIterator
 	NewSimpleIterator() Iterator
 }
 
@@ -46,16 +46,16 @@ type Iterator interface {
 
 // PartialBlock
 type PartialBlock struct {
-	Hash      string
-	PrevHash  string
+	Hash      []byte
+	PrevHash  []byte
 	Timestamp string
 	Height    int
 }
 
 // Block model
 type Block struct {
-	Hash          string        `json:"hash"`
-	PrevHash      string        `json:"prev_hash"`
+	Hash          []byte        `json:"hash"`
+	PrevHash      []byte        `json:"prev_hash"`
 	Timestamp     string        `json:"timestamp"`
 	Data          []byte        `json:"data"`
 	Height        int           `json:"height"`
@@ -66,11 +66,11 @@ type Block struct {
 
 // PartialTransaction
 type PartialTransaction struct {
-	ID        []byte `json:"id"`
-	Type      string `json:"type"`
-	Sender    string `json:"sender"`
-	Receiver  string `json:"receiver"`
-	Timestamp string `json:"timestamp"`
+	ID        []byte
+	Type      string
+	Sender    string
+	Receiver  string
+	Timestamp string
 }
 
 // Transaction model

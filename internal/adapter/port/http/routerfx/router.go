@@ -4,9 +4,9 @@ package routerfx
 import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 
 	"go.uber.org/zap"
-	"moul.io/chizap"
 
 	pkgcontroller "github.com/structx/go-dpkg/adapter/port/http/controller"
 )
@@ -18,13 +18,10 @@ func New(logger *zap.Logger) chi.Router {
 
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
-	r.Use(chizap.New(
-		logger, &chizap.Opts{
-			WithReferer:   true,
-			WithUserAgent: true,
-		},
-	))
 	r.Use(middleware.Recoverer)
+	r.Use(middleware.URLFormat)
+
+	r.Use(render.SetContentType(render.ContentTypeJSON))
 
 	cc := []interface{}{
 		pkgcontroller.NewBundle(logger),

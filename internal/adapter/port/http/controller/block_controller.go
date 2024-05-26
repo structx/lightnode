@@ -2,6 +2,7 @@
 package controller
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -67,8 +68,8 @@ type FetchByHashResponse struct {
 func NewFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashResponse {
 	return &FetchByHashResponse{
 		Payload: &BlockPayload{
-			Hash:          block.Hash,
-			PrevHash:      block.PrevHash,
+			Hash:          hex.EncodeToString(block.Hash),
+			PrevHash:      hex.EncodeToString(block.PrevHash),
 			Timestamp:     block.Timestamp,
 			Height:        block.Height,
 			AccessCtrlRef: block.AccessCtrlRef,
@@ -94,9 +95,17 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
 	ctx := r.Context()
-	hash := chi.URLParamFromCtx(ctx, "blockHash")
+	bs := chi.URLParamFromCtx(ctx, "blockHash")
 
-	block, err := bc.service.QueryBlockByHash(ctx, []byte(hash))
+	bh, err := hex.DecodeString(bs)
+	if err != nil {
+		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
+		return
+	}
+
+	bc.log.Debugw("FetchByHash", "hash", bs)
+
+	block, err := bc.service.QueryBlockByHash(ctx, bh)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			render.Render(w, r, pkgcontroller.ErrNotFound)
@@ -133,8 +142,8 @@ func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *Pag
 
 	for _, b := range s {
 		bs = append(bs, &BlockPartial{
-			Hash:      b.Hash,
-			PrevHash:  b.PrevHash,
+			Hash:      hex.EncodeToString(b.Hash),
+			PrevHash:  hex.EncodeToString(b.PrevHash),
 			Height:    b.Height,
 			Timestamp: b.Timestamp,
 		})
@@ -149,7 +158,7 @@ func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *Pag
 // Render
 func (ppr *PaginatePartialsResponse) Render(w http.ResponseWriter, _ *http.Request) error {
 	w.WriteHeader(http.StatusAccepted)
-	return nil
+	return json.NewEncoder(w).Encode(ppr)
 }
 
 // PaginatePartials
@@ -181,6 +190,5 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := NewPaginatePartialsResponse(blockSlice, start)
-	_ = render.Render(w, r, response)
+	_ = render.Render(w, r, NewPaginatePartialsResponse(blockSlice, start))
 }

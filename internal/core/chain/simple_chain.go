@@ -9,45 +9,34 @@ import (
 
 	"github.com/cockroachdb/pebble"
 
-	pkgdomain "github.com/structx/go-dpkg/domain"
 	"github.com/structx/lightnode/internal/core/domain"
 )
 
 // SimpleChain chain implementation
 type SimpleChain struct {
-	mtx         sync.RWMutex
-	latestBlock domain.Block
-	state       domain.ChainState
-	kv          pkgdomain.KV
+	mtx          sync.RWMutex
+	latestBlock  domain.Block
+	state        domain.ChainState
+	stateMachine domain.StateMachine
 }
 
 // interface compliance
 var _ domain.Chain = (*SimpleChain)(nil)
 
 // New constructor
-func New(kv pkgdomain.KV) *SimpleChain {
+func New(stateMachine domain.StateMachine) *SimpleChain {
 	return &SimpleChain{
-		kv:          kv,
-		state:       domain.Initializing,
-		latestBlock: domain.Block{},
-		mtx:         sync.RWMutex{},
+		stateMachine: stateMachine,
+		state:        domain.Initializing,
+		latestBlock:  domain.Block{},
+		mtx:          sync.RWMutex{},
 	}
 }
 
 // AddBlock to chain
 func (c *SimpleChain) AddBlock(block domain.Block) error {
-
-	bb, err := json.Marshal(c.latestBlock)
-	if err != nil {
-		return fmt.Errorf("failed to marshal block %v", err)
-	}
-
-	err = c.kv.Put([]byte(c.latestBlock.Hash), bb)
-	if err != nil {
-		return fmt.Errorf("failed to put block into keyvalue store %v", err)
-	}
-	c.latestBlock = block
-
+	// TODO:
+	// implement handler
 	return nil
 }
 
@@ -59,7 +48,7 @@ func (c *SimpleChain) GetLatestBlock() domain.Block {
 // GetBlockByHash ...
 func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
 
-	blockbytes, err := c.kv.Get([]byte(hash))
+	blockbytes, err := c.stateMachine.Get([]byte(hash))
 	if err != nil {
 		if errors.Is(err, pebble.ErrNotFound) {
 			return nil, ErrHashNotFound

@@ -21,7 +21,8 @@ type Log struct {
 
 // StateMachine
 type StateMachine interface {
-	Store(*Log) error
+	Set(key, value []byte) error
+	Get(key []byte) ([]byte, error)
 }
 
 // Raft service interface
