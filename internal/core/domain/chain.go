@@ -44,6 +44,14 @@ type Iterator interface {
 	Next() (*Block, error)
 }
 
+// PartialBlock
+type PartialBlock struct {
+	Hash      string
+	PrevHash  string
+	Timestamp string
+	Height    int
+}
+
 // Block model
 type Block struct {
 	Hash          string        `json:"hash"`
@@ -56,6 +64,15 @@ type Block struct {
 	AccessHash    string        `json:"access_hash"`
 }
 
+// PartialTransaction
+type PartialTransaction struct {
+	ID        []byte `json:"id"`
+	Type      string `json:"type"`
+	Sender    string `json:"sender"`
+	Receiver  string `json:"receiver"`
+	Timestamp string `json:"timestamp"`
+}
+
 // Transaction model
 type Transaction struct {
 	ID            []byte   `json:"id"`
@@ -63,6 +80,7 @@ type Transaction struct {
 	Sender        string   `json:"sender"`
 	Receiver      string   `json:"receiver"`
 	Data          []byte   `json:"data"`
+	Timestamp     string   `json:"timestamp"`
 	Signatures    []string `json:"signatures"`
 	AccessCtrlRef string   `json:"access_ctrl_ref"`
 }

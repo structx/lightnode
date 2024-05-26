@@ -5,9 +5,9 @@ import "github.com/structx/lightnode/internal/core/domain"
 // SimpleRaft
 type SimpleRaft struct {
 	// persistent state
-	currentTerm int64        // latest term server has seen
-	votedFor    string       // candidateId that received vote in current term
-	logs        []domain.Log // log entries; each entry contains command for state machine
+	currentTerm int64         // latest term server has seen
+	votedFor    string        // candidateId that received vote in current term
+	logs        []*domain.Log // log entries; each entry contains command for state machine
 	// volatile state
 	commitIndex int64 // index of highest log entry
 	lastApplied int64 // index of highest log entry applied to state machine
@@ -48,8 +48,23 @@ func (sr *SimpleRaft) GetVotedFor() string {
 }
 
 // GetLogs
-func (sr *SimpleRaft) GetLogs() []domain.Log {
+func (sr *SimpleRaft) GetLogs() []*domain.Log {
 	return sr.logs
+}
+
+// GetCommitIndex
+func (sr *SimpleRaft) GetCommitIndex() int64 {
+	return sr.commitIndex
+}
+
+// SetCommitIndex
+func (sr *SimpleRaft) SetCommitIndex(index int64) {
+	sr.commitIndex = index
+}
+
+// GetState
+func (sr *SimpleRaft) GetState() domain.RaftStateEnum {
+	return sr.state
 }
 
 // AppendEntries

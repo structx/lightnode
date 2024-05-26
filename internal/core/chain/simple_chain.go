@@ -3,19 +3,14 @@ package chain
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io"
 	"sync"
-	"time"
 
-	"github.com/hashicorp/raft"
+	"github.com/cockroachdb/pebble"
 
 	pkgdomain "github.com/structx/go-dpkg/domain"
 	"github.com/structx/lightnode/internal/core/domain"
-)
-
-const (
-	maxHeight = 15268
 )
 
 // SimpleChain chain implementation
@@ -28,7 +23,6 @@ type SimpleChain struct {
 
 // interface compliance
 var _ domain.Chain = (*SimpleChain)(nil)
-var _ raft.FSM = (*SimpleChain)(nil)
 
 // New constructor
 func New(kv pkgdomain.KV) *SimpleChain {
@@ -67,6 +61,10 @@ func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
 
 	blockbytes, err := c.kv.Get([]byte(hash))
 	if err != nil {
+		if errors.Is(err, pebble.ErrNotFound) {
+			return nil, ErrHashNotFound
+		}
+
 		return nil, fmt.Errorf("failed get block from store %v", err)
 	}
 
@@ -86,27 +84,15 @@ func (c *SimpleChain) GetBlockHeight() int {
 
 // ValidateBlock verify block is valid
 func (c *SimpleChain) ValidateBlock(block domain.Block) error {
-
-	when, err := time.Parse(time.RFC3339Nano, block.Timestamp)
-	if err != nil {
-		return fmt.Errorf("failed to validate timestamp %v", err)
-	}
-
-	if when.After(time.Now()) {
-		return &ErrInvalidBlock{Field: "timestamp", Value: block.Timestamp}
-	}
-
+	// TODO:
+	// implement function once block is defined
 	return nil
 }
 
 // ExecuteTransaction add transaction to latest block
 func (c *SimpleChain) ExecuteTransaction(tx domain.Transaction) error {
-
-	// compare max height with current height
-	if c.latestBlock.Height >= maxHeight {
-		return &ErrBlockMaxHeight{CurrentHeight: c.latestBlock.Height, MaxHeight: maxHeight}
-	}
-
+	// TODO:
+	// implement max block height check
 	c.latestBlock.Transactions = append(c.latestBlock.Transactions, tx)
 	return nil
 }
@@ -128,23 +114,4 @@ func (c *SimpleChain) AddTransaction(_ domain.Transaction) error {
 // GetState getter chain state
 func (c *SimpleChain) GetState() domain.ChainState {
 	return c.state
-}
-
-// Apply ...
-func (c *SimpleChain) Apply(_ *raft.Log) interface{} {
-	c.mtx.Lock()
-	defer c.mtx.Unlock()
-	// TODO:
-	// implement handler
-	return nil
-}
-
-// Snapshot ...
-func (c *SimpleChain) Snapshot() (raft.FSMSnapshot, error) {
-	return nil, nil
-}
-
-// Restore ...
-func (c *SimpleChain) Restore(_ io.ReadCloser) error {
-	return nil
 }

@@ -53,11 +53,11 @@ func (suite *BlockControllerSuite) SetupTest() {
 		mock.AnythingOfType("int64"),
 		mock.AnythingOfType("int64"),
 	).Return(
-		[]*domain.Block{},
+		[]*domain.PartialBlock{},
 		nil,
 	).Maybe()
 
-	suite.blocks = controller.NewBlocks(logger, nil)
+	suite.blocks = controller.NewBlocks(logger, mockService)
 }
 
 func (suite *BlockControllerSuite) TestFetchByHash() {

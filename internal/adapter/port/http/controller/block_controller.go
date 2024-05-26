@@ -3,6 +3,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -15,6 +16,7 @@ import (
 
 	pkgcontroller "github.com/structx/go-dpkg/adapter/port/http/controller"
 	"github.com/structx/lightnode/internal/core/domain"
+	"github.com/structx/lightnode/internal/core/service"
 )
 
 // Blocks ...
@@ -46,7 +48,14 @@ func (bc *Blocks) RegisterRoutesV1(r chi.Router) {
 }
 
 // BlockPayload
-type BlockPayload struct{}
+type BlockPayload struct {
+	Hash          string `json:"hash"`
+	PrevHash      string `json:"prev_hash"`
+	Timestamp     string `json:"timestamp"`
+	Height        int    `json:"height"`
+	AccessCtrlRef string `json:"access_ctrl_ref"`
+	AccessHash    string `json:"access_hash"`
+}
 
 // FetchByHashResponse
 type FetchByHashResponse struct {
@@ -56,7 +65,17 @@ type FetchByHashResponse struct {
 
 // NewFetchByHashResponse
 func NewFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashResponse {
-	return &FetchByHashResponse{}
+	return &FetchByHashResponse{
+		Payload: &BlockPayload{
+			Hash:          block.Hash,
+			PrevHash:      block.PrevHash,
+			Timestamp:     block.Timestamp,
+			Height:        block.Height,
+			AccessCtrlRef: block.AccessCtrlRef,
+			AccessHash:    block.AccessHash,
+		},
+		Elapsed: time.Since(start).Milliseconds(),
+	}
 }
 
 // Render
@@ -79,16 +98,25 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 
 	block, err := bc.service.QueryBlockByHash(ctx, []byte(hash))
 	if err != nil {
+		if errors.Is(err, service.ErrNotFound) {
+			render.Render(w, r, pkgcontroller.ErrNotFound)
+			return
+		}
 
+		bc.log.Errorf("failed to query block by hash %v", err)
+		render.Render(w, r, pkgcontroller.ErrInternalServerError)
+		return
 	}
 
 	response := NewFetchByHashResponse(block, start)
-	render.Render(w, r, response)
+	_ = render.Render(w, r, response)
 }
 
 // BlockPartial
 type BlockPartial struct {
 	Hash      string `json:"hash"`
+	PrevHash  string `json:"prev_hash"`
+	Height    int    `json:"height"`
 	Timestamp string `json:"timestamp"`
 }
 
@@ -99,13 +127,15 @@ type PaginatePartialsResponse struct {
 }
 
 // NewPaginatePartialsResponse
-func NewPaginatePartialsResponse(s []*domain.Block, start time.Time) *PaginatePartialsResponse {
+func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *PaginatePartialsResponse {
 
 	bs := make([]*BlockPartial, 0, len(s))
 
 	for _, b := range s {
 		bs = append(bs, &BlockPartial{
 			Hash:      b.Hash,
+			PrevHash:  b.PrevHash,
+			Height:    b.Height,
 			Timestamp: b.Timestamp,
 		})
 	}
@@ -146,6 +176,8 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 
 	blockSlice, err := bc.service.PaginateBlocks(ctx, limit, offset)
 	if err != nil {
+		bc.log.Errorf("failed to paginate blocks %v", err)
+		_ = render.Render(w, r, pkgcontroller.ErrInternalServerError)
 		return
 	}
 

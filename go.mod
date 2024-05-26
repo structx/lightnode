@@ -8,7 +8,7 @@ require (
 	github.com/go-chi/render v1.0.3
 	github.com/hashicorp/raft v1.6.1
 	github.com/stretchr/testify v1.8.4
-	github.com/structx/go-dpkg v0.0.10
+	github.com/structx/go-dpkg v0.0.11
 	go.uber.org/fx v1.21.1
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0

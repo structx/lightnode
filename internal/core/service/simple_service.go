@@ -2,8 +2,10 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
+	"github.com/structx/lightnode/internal/core/chain"
 	"github.com/structx/lightnode/internal/core/domain"
 )
 
@@ -22,6 +24,9 @@ func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (*dom
 
 		block, err := ss.ch.GetBlockByHash(string(hash))
 		if err != nil {
+			if errors.Is(err, chain.ErrHashNotFound) {
+				return nil, ErrNotFound
+			}
 			return nil, fmt.Errorf("failed to get block by hash %v", err)
 		}
 

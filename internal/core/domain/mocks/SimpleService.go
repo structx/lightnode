@@ -23,23 +23,23 @@ func (_m *SimpleService) EXPECT() *SimpleService_Expecter {
 }
 
 // PaginateBlocks provides a mock function with given fields: ctx, limit, offset
-func (_m *SimpleService) PaginateBlocks(ctx context.Context, limit int64, offset int64) ([]*domain.Block, error) {
+func (_m *SimpleService) PaginateBlocks(ctx context.Context, limit int64, offset int64) ([]*domain.PartialBlock, error) {
 	ret := _m.Called(ctx, limit, offset)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PaginateBlocks")
 	}
 
-	var r0 []*domain.Block
+	var r0 []*domain.PartialBlock
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) ([]*domain.Block, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) ([]*domain.PartialBlock, error)); ok {
 		return rf(ctx, limit, offset)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) []*domain.Block); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, int64, int64) []*domain.PartialBlock); ok {
 		r0 = rf(ctx, limit, offset)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*domain.Block)
+			r0 = ret.Get(0).([]*domain.PartialBlock)
 		}
 	}
 
@@ -72,12 +72,73 @@ func (_c *SimpleService_PaginateBlocks_Call) Run(run func(ctx context.Context, l
 	return _c
 }
 
-func (_c *SimpleService_PaginateBlocks_Call) Return(_a0 []*domain.Block, _a1 error) *SimpleService_PaginateBlocks_Call {
+func (_c *SimpleService_PaginateBlocks_Call) Return(_a0 []*domain.PartialBlock, _a1 error) *SimpleService_PaginateBlocks_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *SimpleService_PaginateBlocks_Call) RunAndReturn(run func(context.Context, int64, int64) ([]*domain.Block, error)) *SimpleService_PaginateBlocks_Call {
+func (_c *SimpleService_PaginateBlocks_Call) RunAndReturn(run func(context.Context, int64, int64) ([]*domain.PartialBlock, error)) *SimpleService_PaginateBlocks_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PaginateTransactions provides a mock function with given fields: ctx, blockHash, limit, offset
+func (_m *SimpleService) PaginateTransactions(ctx context.Context, blockHash []byte, limit int64, offset int64) ([]*domain.PartialTransaction, error) {
+	ret := _m.Called(ctx, blockHash, limit, offset)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PaginateTransactions")
+	}
+
+	var r0 []*domain.PartialTransaction
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, []byte, int64, int64) ([]*domain.PartialTransaction, error)); ok {
+		return rf(ctx, blockHash, limit, offset)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, []byte, int64, int64) []*domain.PartialTransaction); ok {
+		r0 = rf(ctx, blockHash, limit, offset)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*domain.PartialTransaction)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, []byte, int64, int64) error); ok {
+		r1 = rf(ctx, blockHash, limit, offset)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SimpleService_PaginateTransactions_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PaginateTransactions'
+type SimpleService_PaginateTransactions_Call struct {
+	*mock.Call
+}
+
+// PaginateTransactions is a helper method to define mock.On call
+//   - ctx context.Context
+//   - blockHash []byte
+//   - limit int64
+//   - offset int64
+func (_e *SimpleService_Expecter) PaginateTransactions(ctx interface{}, blockHash interface{}, limit interface{}, offset interface{}) *SimpleService_PaginateTransactions_Call {
+	return &SimpleService_PaginateTransactions_Call{Call: _e.mock.On("PaginateTransactions", ctx, blockHash, limit, offset)}
+}
+
+func (_c *SimpleService_PaginateTransactions_Call) Run(run func(ctx context.Context, blockHash []byte, limit int64, offset int64)) *SimpleService_PaginateTransactions_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]byte), args[2].(int64), args[3].(int64))
+	})
+	return _c
+}
+
+func (_c *SimpleService_PaginateTransactions_Call) Return(_a0 []*domain.PartialTransaction, _a1 error) *SimpleService_PaginateTransactions_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SimpleService_PaginateTransactions_Call) RunAndReturn(run func(context.Context, []byte, int64, int64) ([]*domain.PartialTransaction, error)) *SimpleService_PaginateTransactions_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -137,6 +198,66 @@ func (_c *SimpleService_QueryBlockByHash_Call) Return(_a0 *domain.Block, _a1 err
 }
 
 func (_c *SimpleService_QueryBlockByHash_Call) RunAndReturn(run func(context.Context, []byte) (*domain.Block, error)) *SimpleService_QueryBlockByHash_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ReadTxByHash provides a mock function with given fields: ctx, blockHash, txHash
+func (_m *SimpleService) ReadTxByHash(ctx context.Context, blockHash []byte, txHash []byte) (*domain.Transaction, error) {
+	ret := _m.Called(ctx, blockHash, txHash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ReadTxByHash")
+	}
+
+	var r0 *domain.Transaction
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, []byte, []byte) (*domain.Transaction, error)); ok {
+		return rf(ctx, blockHash, txHash)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, []byte, []byte) *domain.Transaction); ok {
+		r0 = rf(ctx, blockHash, txHash)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domain.Transaction)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, []byte, []byte) error); ok {
+		r1 = rf(ctx, blockHash, txHash)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// SimpleService_ReadTxByHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ReadTxByHash'
+type SimpleService_ReadTxByHash_Call struct {
+	*mock.Call
+}
+
+// ReadTxByHash is a helper method to define mock.On call
+//   - ctx context.Context
+//   - blockHash []byte
+//   - txHash []byte
+func (_e *SimpleService_Expecter) ReadTxByHash(ctx interface{}, blockHash interface{}, txHash interface{}) *SimpleService_ReadTxByHash_Call {
+	return &SimpleService_ReadTxByHash_Call{Call: _e.mock.On("ReadTxByHash", ctx, blockHash, txHash)}
+}
+
+func (_c *SimpleService_ReadTxByHash_Call) Run(run func(ctx context.Context, blockHash []byte, txHash []byte)) *SimpleService_ReadTxByHash_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].([]byte), args[2].([]byte))
+	})
+	return _c
+}
+
+func (_c *SimpleService_ReadTxByHash_Call) Return(_a0 *domain.Transaction, _a1 error) *SimpleService_ReadTxByHash_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *SimpleService_ReadTxByHash_Call) RunAndReturn(run func(context.Context, []byte, []byte) (*domain.Transaction, error)) *SimpleService_ReadTxByHash_Call {
 	_c.Call.Return(run)
 	return _c
 }
