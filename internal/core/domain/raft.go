@@ -1,11 +1,35 @@
 package domain
 
+// RaftStateEnum
+type RaftStateEnum int
+
+const (
+	// Follower
+	Follower RaftStateEnum = iota
+	// Candidate
+	Candidate
+	// Leader
+	Leader
+)
+
 // Log
-type Log struct{}
+type Log struct {
+	Index int64  `json:"index"`
+	Term  int64  `json:"term"`
+	Cmd   []byte `json:"cmd"`
+}
+
+// StateMachine
+type StateMachine interface {
+	Store(*Log) error
+}
 
 // Raft service interface
 type Raft interface {
+	GetState() RaftStateEnum
 	GetCurrentTerm() int64
 	GetVotedFor() string
-	GetLogs() []Log
+	GetLogs() []*Log
+	GetCommitIndex() int64
+	SetCommitIndex(index int64)
 }

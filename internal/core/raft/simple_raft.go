@@ -14,7 +14,12 @@ type SimpleRaft struct {
 	// volatile state on leaders
 	nextIndex  []int64
 	matchIndex []int64
+
+	state domain.RaftStateEnum
 }
+
+// interface compliance
+var _ domain.Raft = (*SimpleRaft)(nil)
 
 // NewSimpleRaft
 func NewSimpleRaft() *SimpleRaft {
@@ -27,6 +32,8 @@ func NewSimpleRaft() *SimpleRaft {
 		lastApplied: 0,
 		// volatile state on leaders
 		matchIndex: []int64{0},
+
+		state: domain.Follower,
 	}
 }
 
