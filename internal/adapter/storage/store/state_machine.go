@@ -67,6 +67,7 @@ func (sm *StateMachine) Get(key []byte) ([]byte, error) {
 	return b, nil
 }
 
+// Iterator
 func (sm *StateMachine) Iterator() domain.Iterator {
 
 	txn := sm.db.NewTransaction(false)

@@ -7,6 +7,8 @@ type ChainState int
 const (
 	// Initializing chain is starting up
 	Initializing ChainState = iota
+	// Running chain is running
+	Running
 )
 
 // SigWallet ...
@@ -44,14 +46,6 @@ type Iterator interface {
 	Next() (*Block, error)
 }
 
-// PartialBlock
-type PartialBlock struct {
-	Hash      []byte
-	PrevHash  []byte
-	Timestamp string
-	Height    int
-}
-
 // Block model
 type Block struct {
 	Hash          []byte        `json:"hash"`
@@ -64,13 +58,22 @@ type Block struct {
 	AccessHash    string        `json:"access_hash"`
 }
 
-// PartialTransaction
-type PartialTransaction struct {
-	ID        []byte
-	Type      string
-	Sender    string
-	Receiver  string
+// PartialBlock
+type PartialBlock struct {
+	Hash      []byte
+	PrevHash  []byte
 	Timestamp string
+	Height    int
+}
+
+// NewTransaction
+type NewTransaction struct {
+	Type          string
+	Sender        string
+	Receiver      string
+	Data          []byte
+	Signatures    []string
+	AccessCtrlRef string
 }
 
 // Transaction model
@@ -83,4 +86,13 @@ type Transaction struct {
 	Timestamp     string   `json:"timestamp"`
 	Signatures    []string `json:"signatures"`
 	AccessCtrlRef string   `json:"access_ctrl_ref"`
+}
+
+// PartialTransaction
+type PartialTransaction struct {
+	ID        []byte
+	Type      string
+	Sender    string
+	Receiver  string
+	Timestamp string
 }
