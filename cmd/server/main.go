@@ -11,8 +11,6 @@ import (
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 
-	"github.com/hashicorp/raft"
-
 	"github.com/structx/go-dpkg/adapter/port/http/serverfx"
 	"github.com/structx/go-dpkg/adapter/port/raftfx"
 	"github.com/structx/go-dpkg/adapter/setup"
@@ -32,7 +30,7 @@ func main() {
 		fx.Invoke(decode.ConfigFromEnv),
 		fx.Provide(logging.New),
 		fx.Provide(fx.Annotate(kv.NewPebble, fx.As(new(pkgdomain.KV)))),
-		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)), fx.As(new(raft.FSM)))),
+		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)))),
 		fx.Provide(fx.Annotate(routerfx.New, fx.As(new(http.Handler)))),
 		fx.Provide(serverfx.New),
 		fx.Provide(raftfx.New),
@@ -43,7 +41,7 @@ func main() {
 	).Run()
 }
 
-func registerHooks(lc fx.Lifecycle, server *http.Server, raft *raft.Raft) error {
+func registerHooks(lc fx.Lifecycle, server *http.Server) error {
 	lc.Append(
 		fx.Hook{
 			OnStart: func(_ context.Context) error {
@@ -65,12 +63,6 @@ func registerHooks(lc fx.Lifecycle, server *http.Server, raft *raft.Raft) error 
 				err := server.Shutdown(ctx)
 				if err != nil {
 					result = multierr.Append(result, fmt.Errorf("failed to shutdown http server %v", err))
-				}
-
-				fut := raft.Shutdown()
-				err = fut.Error()
-				if err != nil {
-					result = multierr.Append(result, fmt.Errorf("failed to shutdown raft %v", err))
 				}
 
 				return result

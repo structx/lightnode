@@ -21,24 +21,10 @@ type Wallet struct{}
 type Chain interface {
 	// AddBlock to chain
 	AddBlock(Block) error
-	// GetLatestBlock getter latest block
-	GetLatestBlock() Block
 	// GetBlockByHash retrieve block by hash
 	GetBlockByHash(string) (*Block, error)
-	// GetBlockHeight getter latest block height
-	GetBlockHeight() int
-	// ValidateBlock verify block is valid
-	ValidateBlock(Block) error
-	// ExecuteTransaction ...
-	ExecuteTransaction(tx Transaction) error
-	// GetPendingTransactions getter list of pending transactions
-	GetPendingTransactions() []Transaction
 	// AddTransaction add transaction to block
 	AddTransaction(tx Transaction) error
-	// GetState getter current chain state
-	GetState() ChainState
-	// NewSimpleIterator
-	NewSimpleIterator() Iterator
 }
 
 // Iterator

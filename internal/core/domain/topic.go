@@ -5,7 +5,7 @@ type Topic string
 
 const (
 	// SimpleChainQuery query by block hash
-	SimpleChainQuery Topic = "simple_chain_query"
+	SubmitTransaction Topic = "submit_transaction"
 )
 
 // String cast enum to string
@@ -15,5 +15,7 @@ func (t Topic) String() string {
 
 // List all topics
 func (t Topic) List() []Topic {
-	return []Topic{SimpleChainQuery}
+	return []Topic{
+		SubmitTransaction,
+	}
 }

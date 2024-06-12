@@ -20,15 +20,13 @@ var (
 // Bundle application service bundle
 type Bundle struct {
 	c domain.Chain
-	r domain.Raft
 	m pkgdomain.MessageBroker
 }
 
 // New constructor
-func New(chain domain.Chain, raft domain.Raft, messenger pkgdomain.MessageBroker) *Bundle {
+func New(chain domain.Chain, messenger pkgdomain.MessageBroker) *Bundle {
 	return &Bundle{
 		c: chain,
-		r: raft,
 		m: messenger,
 	}
 }

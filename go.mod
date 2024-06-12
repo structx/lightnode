@@ -7,7 +7,6 @@ require (
 	github.com/dgraph-io/badger/v4 v4.2.0
 	github.com/go-chi/chi/v5 v5.0.12
 	github.com/go-chi/render v1.0.3
-	github.com/hashicorp/raft v1.6.1
 	github.com/stretchr/testify v1.8.4
 	github.com/structx/go-dpkg v0.0.11
 	go.uber.org/fx v1.21.1
@@ -53,6 +52,7 @@ require (
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/hcl/v2 v2.20.1 // indirect
+	github.com/hashicorp/raft v1.6.1 // indirect
 	github.com/hashicorp/raft-boltdb v0.0.0-20231211162105-6c830fa4535e // indirect
 	github.com/klauspost/compress v1.15.15 // indirect
 	github.com/kr/pretty v0.3.1 // indirect

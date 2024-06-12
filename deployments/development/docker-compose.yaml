@@ -1,0 +1,7 @@
+---
+version: '3.7'
+
+services:
+  lightnode:
+    image: trevatk/lightnode:latest
+    container_name: lightnode

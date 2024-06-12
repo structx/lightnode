@@ -14,22 +14,18 @@ import (
 
 // SimpleChain chain implementation
 type SimpleChain struct {
-	mtx          sync.RWMutex
-	latestBlock  domain.Block
-	state        domain.ChainState
-	stateMachine domain.StateMachine
+	mtx        sync.RWMutex
+	latestHash string
 }
 
 // interface compliance
 var _ domain.Chain = (*SimpleChain)(nil)
 
 // New constructor
-func New(stateMachine domain.StateMachine) *SimpleChain {
+func New() *SimpleChain {
 	return &SimpleChain{
-		stateMachine: stateMachine,
-		state:        domain.Initializing,
-		latestBlock:  domain.Block{},
-		mtx:          sync.RWMutex{},
+		latestHash: "",
+		mtx:        sync.RWMutex{},
 	}
 }
 

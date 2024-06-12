@@ -36,7 +36,7 @@ func NewStateMachine() (*StateMachine, error) {
 }
 
 // Set
-func (sm *StateMachine) Set(key, value []byte) error {
+func (sm *StateMachine) Put(key, value []byte) error {
 	return sm.db.Update(func(txn *badger.Txn) error {
 		return txn.Set(key, value)
 	})
@@ -67,11 +67,7 @@ func (sm *StateMachine) Get(key []byte) ([]byte, error) {
 	return b, nil
 }
 
-// Iterator
-func (sm *StateMachine) Iterator() domain.Iterator {
-
-	txn := sm.db.NewTransaction(false)
-
-	opts := badger.IteratorOptions{}
-	it := txn.NewIterator(opts)
+// Close
+func (sm *StateMachine) Close() error {
+	return sm.db.Close()
 }
