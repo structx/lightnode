@@ -143,12 +143,12 @@ func (_c *SimpleService_PaginateTransactions_Call) RunAndReturn(run func(context
 	return _c
 }
 
-// QueryBlockByHash provides a mock function with given fields: ctx, hash
-func (_m *SimpleService) QueryBlockByHash(ctx context.Context, hash []byte) (*domain.Block, error) {
+// ReadBlockByHash provides a mock function with given fields: ctx, hash
+func (_m *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (*domain.Block, error) {
 	ret := _m.Called(ctx, hash)
 
 	if len(ret) == 0 {
-		panic("no return value specified for QueryBlockByHash")
+		panic("no return value specified for ReadBlockByHash")
 	}
 
 	var r0 *domain.Block
@@ -173,31 +173,31 @@ func (_m *SimpleService) QueryBlockByHash(ctx context.Context, hash []byte) (*do
 	return r0, r1
 }
 
-// SimpleService_QueryBlockByHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'QueryBlockByHash'
-type SimpleService_QueryBlockByHash_Call struct {
+// SimpleService_ReadBlockByHash_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ReadBlockByHash'
+type SimpleService_ReadBlockByHash_Call struct {
 	*mock.Call
 }
 
-// QueryBlockByHash is a helper method to define mock.On call
+// ReadBlockByHash is a helper method to define mock.On call
 //   - ctx context.Context
 //   - hash []byte
-func (_e *SimpleService_Expecter) QueryBlockByHash(ctx interface{}, hash interface{}) *SimpleService_QueryBlockByHash_Call {
-	return &SimpleService_QueryBlockByHash_Call{Call: _e.mock.On("QueryBlockByHash", ctx, hash)}
+func (_e *SimpleService_Expecter) ReadBlockByHash(ctx interface{}, hash interface{}) *SimpleService_ReadBlockByHash_Call {
+	return &SimpleService_ReadBlockByHash_Call{Call: _e.mock.On("ReadBlockByHash", ctx, hash)}
 }
 
-func (_c *SimpleService_QueryBlockByHash_Call) Run(run func(ctx context.Context, hash []byte)) *SimpleService_QueryBlockByHash_Call {
+func (_c *SimpleService_ReadBlockByHash_Call) Run(run func(ctx context.Context, hash []byte)) *SimpleService_ReadBlockByHash_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].([]byte))
 	})
 	return _c
 }
 
-func (_c *SimpleService_QueryBlockByHash_Call) Return(_a0 *domain.Block, _a1 error) *SimpleService_QueryBlockByHash_Call {
+func (_c *SimpleService_ReadBlockByHash_Call) Return(_a0 *domain.Block, _a1 error) *SimpleService_ReadBlockByHash_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *SimpleService_QueryBlockByHash_Call) RunAndReturn(run func(context.Context, []byte) (*domain.Block, error)) *SimpleService_QueryBlockByHash_Call {
+func (_c *SimpleService_ReadBlockByHash_Call) RunAndReturn(run func(context.Context, []byte) (*domain.Block, error)) *SimpleService_ReadBlockByHash_Call {
 	_c.Call.Return(run)
 	return _c
 }

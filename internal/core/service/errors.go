@@ -4,5 +4,5 @@ import "errors"
 
 var (
 	// ErrNotFound
-	ErrNotFound = errors.New("entity not found.")
+	ErrNotFound = errors.New("entity not found")
 )

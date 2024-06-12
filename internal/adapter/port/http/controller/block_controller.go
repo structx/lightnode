@@ -3,9 +3,7 @@ package controller
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -82,10 +80,6 @@ func NewFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashRe
 // Render
 func (fr *FetchByHashResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	w.WriteHeader(http.StatusAccepted)
-	err := json.NewEncoder(w).Encode(fr)
-	if err != nil {
-		return fmt.Errorf("failed to encode response %v", err)
-	}
 	return nil
 }
 
@@ -105,7 +99,7 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 
 	bc.log.Debugw("FetchByHash", "hash", bs)
 
-	block, err := bc.service.QueryBlockByHash(ctx, bh)
+	block, err := bc.service.ReadBlockByHash(ctx, bh)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			render.Render(w, r, pkgcontroller.ErrNotFound)
@@ -158,7 +152,8 @@ func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *Pag
 // Render
 func (ppr *PaginatePartialsResponse) Render(w http.ResponseWriter, _ *http.Request) error {
 	w.WriteHeader(http.StatusAccepted)
-	return json.NewEncoder(w).Encode(ppr)
+	w.Header().Add("Content-Type", "application/json")
+	return nil
 }
 
 // PaginatePartials

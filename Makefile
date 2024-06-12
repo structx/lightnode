@@ -1,9 +1,9 @@
 
 build:
-	docker build -t registry.structx.local/structx/lightnode:v0.0.1 .
+	docker build -t trevatk/lightnode:latest .
 
 push:
-	docker push registry.structx.local/structx/lightnode:v0.0.1
+	docker push trevatk/lightnode:latest
 
 deps:
 	go mod tidy

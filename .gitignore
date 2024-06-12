@@ -1,6 +1,3 @@
 vendor/
-*.log
-
-.terraform
-.terraform.lock.hcl
-terraform.tfstate*
+logs/
+chain-data/

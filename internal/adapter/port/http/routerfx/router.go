@@ -9,10 +9,12 @@ import (
 	"go.uber.org/zap"
 
 	pkgcontroller "github.com/structx/go-dpkg/adapter/port/http/controller"
+	"github.com/structx/lightnode/internal/adapter/port/http/controller"
+	"github.com/structx/lightnode/internal/core/domain"
 )
 
 // New constructor
-func New(logger *zap.Logger) chi.Router {
+func New(logger *zap.Logger, simpleService domain.SimpleService) chi.Router {
 
 	r := chi.NewRouter()
 
@@ -25,6 +27,7 @@ func New(logger *zap.Logger) chi.Router {
 
 	cc := []interface{}{
 		pkgcontroller.NewBundle(logger),
+		controller.NewBlocks(logger, simpleService),
 	}
 
 	v1 := chi.NewRouter()
@@ -45,8 +48,7 @@ func New(logger *zap.Logger) chi.Router {
 		}
 	}
 
-	r.Mount("/api/v1", v1)
-	r.Mount("/api/v1/protected", v1p)
+	r.Mount("/1.0", v1)
 
 	return r
 }

@@ -40,7 +40,7 @@ func (suite *BlockControllerSuite) SetupTest() {
 	assert.NoError(err)
 
 	mockService := mocks.NewSimpleService(suite.T())
-	mockService.EXPECT().QueryBlockByHash(
+	mockService.EXPECT().ReadBlockByHash(
 		mock.Anything,
 		mock.Anything,
 	).Return(

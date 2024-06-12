@@ -11,29 +11,27 @@ import (
 	"go.uber.org/multierr"
 	"go.uber.org/zap"
 
-	"github.com/structx/go-dpkg/adapter/port/http/serverfx"
-	"github.com/structx/go-dpkg/adapter/port/raftfx"
-	"github.com/structx/go-dpkg/adapter/setup"
-	"github.com/structx/go-dpkg/adapter/storage/kv"
-	pkgdomain "github.com/structx/go-dpkg/domain"
-	"github.com/structx/go-dpkg/util/decode"
-
 	"github.com/structx/lightnode/internal/adapter/logging"
 	"github.com/structx/lightnode/internal/adapter/port/http/routerfx"
+	"github.com/structx/lightnode/internal/adapter/port/http/serverfx"
+	"github.com/structx/lightnode/internal/adapter/storage/store"
 	"github.com/structx/lightnode/internal/core/chain"
 	"github.com/structx/lightnode/internal/core/domain"
+	"github.com/structx/lightnode/internal/core/service"
+	"github.com/structx/lightnode/internal/core/setup"
 )
 
 func main() {
 	fx.New(
-		fx.Provide(fx.Annotate(setup.New, fx.As(new(pkgdomain.Config)))),
-		fx.Invoke(decode.ConfigFromEnv),
+		fx.Provide(context.TODO),
+		fx.Provide(setup.NewConfig),
+		fx.Invoke(setup.ParseConfigFromEnv),
 		fx.Provide(logging.New),
-		fx.Provide(fx.Annotate(kv.NewPebble, fx.As(new(pkgdomain.KV)))),
+		fx.Provide(fx.Annotate(store.NewStateMachine, fx.As(new(domain.StateMachine)))),
 		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)))),
+		fx.Provide(fx.Annotate(service.NewSimpleService, fx.As(new(domain.SimpleService)))),
 		fx.Provide(fx.Annotate(routerfx.New, fx.As(new(http.Handler)))),
-		fx.Provide(serverfx.New),
-		fx.Provide(raftfx.New),
+		fx.Provide(serverfx.NewHttp1Server),
 		fx.Invoke(registerHooks),
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: logger}

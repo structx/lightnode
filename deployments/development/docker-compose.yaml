@@ -5,3 +5,13 @@ services:
   lightnode:
     image: trevatk/lightnode:latest
     container_name: lightnode
+    restart: 'no'
+    ports:
+      - 9002:8080
+    environment:
+      - LOG_PATH=/var/log/lightnode/lightnode.log
+      - LOG_LEVEL=DEBUG
+      - CHAIN_BASE_DIR=/opt/lightnode/data
+    volumes:
+      - ./chain-data:/opt/lightnode/data
+      - ./logs:/var/log/lightnode

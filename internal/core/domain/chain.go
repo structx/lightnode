@@ -25,6 +25,8 @@ type Chain interface {
 	GetBlockByHash(string) (*Block, error)
 	// AddTransaction add transaction to block
 	AddTransaction(tx Transaction) error
+	// Iter
+	Iter() Iterator
 }
 
 // Iterator

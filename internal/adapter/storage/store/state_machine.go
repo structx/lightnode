@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	badger "github.com/dgraph-io/badger/v4"
-	"github.com/dgraph-io/badger/v4/options"
 
 	"github.com/structx/lightnode/internal/core/domain"
+	"github.com/structx/lightnode/internal/core/setup"
 )
 
 // StateMachine
@@ -19,15 +19,11 @@ type StateMachine struct {
 var _ domain.StateMachine = (*StateMachine)(nil)
 
 // NewStateMachine
-func NewStateMachine() (*StateMachine, error) {
+func NewStateMachine(cfg *setup.Config) (*StateMachine, error) {
 
-	opts := badger.Options{
-		Dir:         "/opt/lightnode/data",
-		Compression: options.Snappy,
-	}
-	db, err := badger.Open(opts)
+	db, err := badger.Open(badger.DefaultOptions(cfg.Chain.BaseDir))
 	if err != nil {
-		return nil, fmt.Errorf("failed to open badgerdb %v", err)
+		return nil, fmt.Errorf("failed to open badger directory %v", err)
 	}
 
 	return &StateMachine{
@@ -45,26 +41,28 @@ func (sm *StateMachine) Put(key, value []byte) error {
 // Get
 func (sm *StateMachine) Get(key []byte) ([]byte, error) {
 
-	b := []byte{}
+	dst := []byte{}
 	if err := sm.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get(key)
 		if err != nil {
 			if errors.Is(err, badger.ErrKeyNotFound) {
-				return badger.ErrKeyNotFound
+				return err
 			}
 		}
 
-		_, err = item.ValueCopy(b)
+		src, err := item.ValueCopy(nil)
 		if err != nil {
 			return fmt.Errorf("failed to copy value from db %v", err)
 		}
+
+		dst = src
 
 		return nil
 	}); err != nil {
 		return []byte{}, err
 	}
 
-	return b, nil
+	return dst, nil
 }
 
 // Close

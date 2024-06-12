@@ -14,6 +14,16 @@ type SimpleService struct {
 	ch domain.Chain
 }
 
+// interface compliance
+var _ domain.SimpleService = (*SimpleService)(nil)
+
+// NewSimpleService
+func NewSimpleService(chain domain.Chain) *SimpleService {
+	return &SimpleService{
+		ch: chain,
+	}
+}
+
 // Query operation against blockchain
 func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (*domain.Block, error) {
 
@@ -35,17 +45,17 @@ func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (*dom
 }
 
 // PaginateBlocks
-func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int) ([]*domain.Block, error) {
+func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int64) ([]*domain.PartialBlock, error) {
 
 	select {
 	case <-ctx.Done():
 		return nil, nil
 	default:
 
-		it := ss.ch.NewSimpleIterator()
-		blockSlice := make([]*domain.Block, 0, limit)
+		it := ss.ch.Iter()
+		blockSlice := make([]*domain.PartialBlock, 0, limit)
 
-		count := 0
+		var count int64 = 0
 
 		for {
 
@@ -63,11 +73,26 @@ func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int) 
 					break
 				}
 
-				blockSlice = append(blockSlice, block)
+				blockSlice = append(blockSlice, &domain.PartialBlock{
+					Hash:      block.Hash,
+					PrevHash:  block.PrevHash,
+					Timestamp: block.Timestamp,
+					Height:    block.Height,
+				})
 				count++
 			}
 		}
 
 		return blockSlice, nil
 	}
+}
+
+// ReadTxByHash
+func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash []byte) (*domain.Transaction, error) {
+	return nil, nil
+}
+
+// PaginateTransactions
+func (ss *SimpleService) PaginateTransactions(ctx context.Context, blockHash []byte, limit, offset int64) ([]*domain.PartialTransaction, error) {
+	return nil, nil
 }

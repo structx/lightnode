@@ -1,3 +1,6 @@
 package setup
 
-type Chain struct{}
+// Chain
+type Chain struct {
+	BaseDir string `env:"CHAIN_BASE_DIR, required"`
+}
