@@ -18,13 +18,15 @@ type SigWallet struct{}
 type Wallet struct{}
 
 // Chain ...
+//
+//go:generate mockery --name Chain
 type Chain interface {
 	// AddBlock to chain
 	AddBlock(Block) error
 	// GetBlockByHash retrieve block by hash
-	GetBlockByHash(string) (*Block, error)
+	GetBlockByHash([]byte) (*Block, error)
 	// AddTransaction add transaction to block
-	AddTransaction(tx Transaction) error
+	AddTransaction(*Transaction) error
 	// Iter
 	Iter() Iterator
 }
@@ -36,14 +38,15 @@ type Iterator interface {
 
 // Block model
 type Block struct {
-	Hash          []byte        `json:"hash"`
-	PrevHash      []byte        `json:"prev_hash"`
-	Timestamp     string        `json:"timestamp"`
-	Data          []byte        `json:"data"`
-	Height        int           `json:"height"`
-	Transactions  []Transaction `json:"transactions"`
-	AccessCtrlRef string        `json:"access_ctrl_ref"`
-	AccessHash    string        `json:"access_hash"`
+	Hash          []byte         `json:"hash"`
+	PrevHash      []byte         `json:"prev_hash"`
+	Timestamp     string         `json:"timestamp"`
+	Difficulty    int            `json:"difficulty"`
+	Data          []byte         `json:"data"`
+	Height        int            `json:"height"`
+	Transactions  []*Transaction `json:"transactions"`
+	AccessCtrlRef string         `json:"access_ctrl_ref"`
+	AccessHash    string         `json:"access_hash"`
 }
 
 // PartialBlock
@@ -56,7 +59,6 @@ type PartialBlock struct {
 
 // NewTransaction
 type NewTransaction struct {
-	Type          string
 	Sender        string
 	Receiver      string
 	Data          []byte
@@ -71,6 +73,7 @@ type Transaction struct {
 	Sender        string   `json:"sender"`
 	Receiver      string   `json:"receiver"`
 	Data          []byte   `json:"data"`
+	Amount        int      `json:"amount"`
 	Timestamp     string   `json:"timestamp"`
 	Signatures    []string `json:"signatures"`
 	AccessCtrlRef string   `json:"access_ctrl_ref"`

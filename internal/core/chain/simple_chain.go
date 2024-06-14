@@ -2,6 +2,7 @@
 package chain
 
 import (
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 
 	"github.com/dgraph-io/badger/v4"
 	"github.com/structx/lightnode/internal/core/domain"
+	"github.com/structx/lightnode/internal/core/pow"
 )
 
 const (
@@ -29,16 +31,26 @@ var _ domain.Chain = (*SimpleChain)(nil)
 // New constructor
 func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 
+	coinTx := &domain.Transaction{
+		Sender:        "",
+		Receiver:      "",
+		Data:          []byte("genesis block coin transaction"),
+		Timestamp:     time.Now().String(),
+		Amount:        0,
+		Signatures:    []string{},
+		AccessCtrlRef: "*",
+	}
+
 	gb := &domain.Block{
-		Hash:          []byte("000000000000000000000000000"),
 		Timestamp:     time.Now().Format(time.RFC3339Nano),
 		Height:        1,
 		Data:          []byte("genesis block"),
 		PrevHash:      []byte{},
-		Transactions:  []domain.Transaction{},
+		Transactions:  []*domain.Transaction{coinTx},
 		AccessCtrlRef: "",
 		AccessHash:    "",
 	}
+	pow.GenerateHash(gb)
 
 	genesisbytes, err := json.Marshal(gb)
 	if err != nil {
@@ -65,12 +77,12 @@ func (c *SimpleChain) AddBlock(block domain.Block) error {
 }
 
 // GetBlockByHash ...
-func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
+func (c *SimpleChain) GetBlockByHash(hash []byte) (*domain.Block, error) {
 
-	blockbytes, err := c.stateMachine.Get([]byte(hash))
+	blockbytes, err := c.stateMachine.Get(hash)
 	if err != nil {
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			return nil, ErrHashNotFound
+			return nil, &ErrResourceNotFound{Hash: hex.EncodeToString(hash)}
 		}
 
 		return nil, fmt.Errorf("failed get block from store %v", err)
@@ -86,7 +98,7 @@ func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
 }
 
 // AddTransaction
-func (c *SimpleChain) AddTransaction(tx domain.Transaction) error {
+func (c *SimpleChain) AddTransaction(tx *domain.Transaction) error {
 
 	blockbytes, err := c.stateMachine.Get([]byte(c.latestHash))
 	if err != nil {

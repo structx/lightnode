@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -25,16 +26,23 @@ func NewSimpleService(chain domain.Chain) *SimpleService {
 }
 
 // Query operation against blockchain
-func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash []byte) (*domain.Block, error) {
+func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash string) (*domain.Block, error) {
 
 	select {
 	case <-ctx.Done():
 		return nil, nil
 	default:
 
-		block, err := ss.ch.GetBlockByHash(string(hash))
+		decodedHash, err := hex.DecodeString(hash)
 		if err != nil {
-			if errors.Is(err, chain.ErrHashNotFound) {
+			return nil, fmt.Errorf("failed to decode hash %v", err)
+		}
+
+		block, err := ss.ch.GetBlockByHash(decodedHash)
+		if err != nil {
+
+			var notFound *chain.ErrResourceNotFound
+			if errors.As(err, &notFound) {
 				return nil, ErrNotFound
 			}
 			return nil, fmt.Errorf("failed to get block by hash %v", err)
@@ -93,6 +101,6 @@ func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash []b
 }
 
 // PaginateTransactions
-func (ss *SimpleService) PaginateTransactions(ctx context.Context, blockHash []byte, limit, offset int64) ([]*domain.PartialTransaction, error) {
+func (ss *SimpleService) PaginateTransactions(ctx context.Context, hash string, limit, offset int64) ([]*domain.PartialTransaction, error) {
 	return nil, nil
 }

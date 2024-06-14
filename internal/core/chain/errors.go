@@ -1,10 +1,11 @@
 package chain
 
-import (
-	"errors"
-)
+import "fmt"
 
-var (
-	// ErrHashNotFound
-	ErrHashNotFound = errors.New("hash not found.")
-)
+type ErrResourceNotFound struct {
+	Hash string
+}
+
+func (e *ErrResourceNotFound) Error() string {
+	return fmt.Sprintf("%s not found", e.Hash)
+}

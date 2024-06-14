@@ -163,7 +163,7 @@ func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	blockHash := chi.URLParamFromCtx(ctx, "blockHash")
+	hashStr := chi.URLParamFromCtx(ctx, "blockHash")
 
 	limitStr := r.URL.Query().Get("limit")
 	offsetStr := r.URL.Query().Get("offset")
@@ -180,7 +180,7 @@ func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	txs, err := tx.ss.PaginateTransactions(ctx, []byte(blockHash), limit, offset)
+	txs, err := tx.ss.PaginateTransactions(ctx, hashStr, limit, offset)
 	if err != nil {
 		tx.log.Errorf("failed to paginate transactions %v", err)
 		_ = render.Render(w, r, pkgcontroller.ErrInternalServerError)

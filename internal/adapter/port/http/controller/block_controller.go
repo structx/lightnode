@@ -89,17 +89,11 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 
 	ctx := r.Context()
-	bs := chi.URLParamFromCtx(ctx, "blockHash")
+	hashStr := chi.URLParamFromCtx(ctx, "blockHash")
 
-	bh, err := hex.DecodeString(bs)
-	if err != nil {
-		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
-		return
-	}
+	bc.log.Debugw("FetchByHash", "hash", hashStr)
 
-	bc.log.Debugw("FetchByHash", "hash", bs)
-
-	block, err := bc.service.ReadBlockByHash(ctx, bh)
+	block, err := bc.service.ReadBlockByHash(ctx, hashStr)
 	if err != nil {
 		if errors.Is(err, service.ErrNotFound) {
 			render.Render(w, r, pkgcontroller.ErrNotFound)
