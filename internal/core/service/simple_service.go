@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/hex"
 	"errors"
@@ -97,10 +98,79 @@ func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int64
 
 // ReadTxByHash
 func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash []byte) (*domain.Transaction, error) {
-	return nil, nil
+	select {
+	case <-ctx.Done():
+		return nil, nil
+	default:
+
+		it := ss.ch.Iter()
+
+		for {
+
+			block, err := it.Next()
+			if err != nil {
+				return nil, fmt.Errorf("iterator failed to get next block %v", err)
+			}
+
+			if block == nil {
+				// end of chain
+				return nil, ErrNotFound
+			}
+
+			if bytes.Equal(block.Hash, blockHash) {
+				for _, tx := range block.Transactions {
+					// check if limit reached
+					if bytes.Equal(tx.ID, tx.ID) {
+						return tx, nil
+					}
+				}
+			}
+		}
+	}
 }
 
 // PaginateTransactions
 func (ss *SimpleService) PaginateTransactions(ctx context.Context, hash string, limit, offset int64) ([]*domain.PartialTransaction, error) {
-	return nil, nil
+
+	select {
+	case <-ctx.Done():
+		return nil, nil
+	default:
+
+		it := ss.ch.Iter()
+		txSlice := make([]*domain.PartialTransaction, 0, limit)
+
+		var count int64 = 0
+
+		for {
+
+			block, err := it.Next()
+			if err != nil {
+				return nil, fmt.Errorf("iterator failed to get next block %v", err)
+			}
+
+			if block == nil {
+				// end of chain
+				break
+
+			} else if offset == 0 {
+				for _, tx := range block.Transactions {
+					// check if limit reached
+					if count == limit {
+						break
+					}
+					txSlice = append(txSlice, &domain.PartialTransaction{
+						ID:        tx.ID,
+						Type:      tx.Type,
+						Sender:    tx.Sender,
+						Receiver:  tx.Receiver,
+						Timestamp: tx.Timestamp,
+					})
+					count++
+				}
+			}
+		}
+
+		return txSlice, nil
+	}
 }

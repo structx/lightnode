@@ -31,39 +31,60 @@ var _ domain.Chain = (*SimpleChain)(nil)
 // New constructor
 func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 
-	coinTx := &domain.Transaction{
-		Sender:        "",
-		Receiver:      "",
-		Data:          []byte("genesis block coin transaction"),
-		Timestamp:     time.Now().String(),
-		Amount:        0,
-		Signatures:    []string{},
-		AccessCtrlRef: "*",
-	}
-
-	gb := &domain.Block{
-		Timestamp:     time.Now().Format(time.RFC3339Nano),
-		Height:        1,
-		Data:          []byte("genesis block"),
-		PrevHash:      []byte{},
-		Transactions:  []*domain.Transaction{coinTx},
-		AccessCtrlRef: "",
-		AccessHash:    "",
-	}
-	pow.GenerateHash(gb)
-
-	genesisbytes, err := json.Marshal(gb)
+	hash, err := stateMachine.Get([]byte(lastHash))
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal genesis block %v", err)
-	}
+		if errors.Is(err, badger.ErrKeyNotFound) {
+			coinTx := &domain.Transaction{
+				Sender:        "",
+				Receiver:      "",
+				Data:          []byte("genesis block coin transaction"),
+				Timestamp:     time.Now().String(),
+				Amount:        0,
+				Signatures:    []string{},
+				AccessCtrlRef: "*",
+			}
+			err = coinTx.SetID()
+			if err != nil {
+				return nil, fmt.Errorf("unable to set transaction id %v", err)
+			}
 
-	err = stateMachine.Put(gb.Hash, genesisbytes)
-	if err != nil {
-		return nil, fmt.Errorf("failed to put genesis block %v", err)
+			gb := &domain.Block{
+				Timestamp:     time.Now().Format(time.RFC3339Nano),
+				Height:        1,
+				Data:          []byte("genesis block"),
+				PrevHash:      []byte{},
+				Transactions:  []*domain.Transaction{coinTx},
+				AccessCtrlRef: "",
+				AccessHash:    "",
+			}
+			pow.GenerateHash(gb)
+
+			genesisbytes, err := json.Marshal(gb)
+			if err != nil {
+				return nil, fmt.Errorf("failed to marshal genesis block %v", err)
+			}
+
+			err = stateMachine.Put(gb.Hash, genesisbytes)
+			if err != nil {
+				return nil, fmt.Errorf("failed to put genesis block %v", err)
+			}
+
+			err = stateMachine.Put([]byte(lastHash), gb.Hash)
+			if err != nil {
+				return nil, fmt.Errorf("unable to put last hash %v", err)
+			}
+
+			return &SimpleChain{
+				latestHash:   gb.Hash,
+				stateMachine: stateMachine,
+				mtx:          sync.RWMutex{},
+			}, nil
+		}
+		return nil, fmt.Errorf("failed to get last hash %v", err)
 	}
 
 	return &SimpleChain{
-		latestHash:   gb.Hash,
+		latestHash:   hash,
 		stateMachine: stateMachine,
 		mtx:          sync.RWMutex{},
 	}, nil

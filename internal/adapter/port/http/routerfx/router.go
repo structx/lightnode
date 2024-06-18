@@ -1,4 +1,4 @@
-// Package router chi router provider
+// Package routerfx chi router provider
 package routerfx
 
 import (
@@ -28,6 +28,7 @@ func New(logger *zap.Logger, simpleService domain.SimpleService) chi.Router {
 	cc := []interface{}{
 		pkgcontroller.NewBundle(logger),
 		controller.NewBlocks(logger, simpleService),
+		controller.NewTransactions(logger, simpleService),
 	}
 
 	v1 := chi.NewRouter()

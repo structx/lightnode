@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
@@ -79,7 +78,7 @@ func NewFetchTxResponse(tx *domain.Transaction, start time.Time) *FetchTxRespons
 // Render
 func (ftr *FetchTxResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	w.WriteHeader(http.StatusAccepted)
-	return json.NewEncoder(w).Encode(ftr)
+	return nil
 }
 
 // Fetch
@@ -153,7 +152,7 @@ func NewPaginateTransactionsResponse(s []*domain.PartialTransaction, start time.
 // Render
 func (ptr *PaginateTransactionsResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	w.WriteHeader(http.StatusAccepted)
-	return json.NewEncoder(w).Encode(ptr)
+	return nil
 }
 
 // Paginate

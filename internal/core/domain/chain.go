@@ -1,6 +1,13 @@
 // Package domain application layer models and interfaces
 package domain
 
+import (
+	"encoding/json"
+	"fmt"
+
+	"golang.org/x/crypto/sha3"
+)
+
 // ChainState current state of chain
 type ChainState int
 
@@ -77,6 +84,21 @@ type Transaction struct {
 	Timestamp     string   `json:"timestamp"`
 	Signatures    []string `json:"signatures"`
 	AccessCtrlRef string   `json:"access_ctrl_ref"`
+}
+
+func (tx *Transaction) SetID() error {
+
+	txbytes, err := json.Marshal(tx)
+	if err != nil {
+		return fmt.Errorf("unable to marshal tranasction %v", err)
+	}
+
+	h := sha3.New224()
+	h.Write(txbytes)
+
+	tx.ID = h.Sum(nil)
+
+	return nil
 }
 
 // PartialTransaction
