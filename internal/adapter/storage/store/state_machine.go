@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	badger "github.com/dgraph-io/badger/v4"
+	"github.com/dgraph-io/badger/v4/options"
 
 	"github.com/structx/lightnode/internal/core/domain"
 	"github.com/structx/lightnode/internal/core/setup"
@@ -21,7 +22,11 @@ var _ domain.StateMachine = (*StateMachine)(nil)
 // NewStateMachine
 func NewStateMachine(cfg *setup.Config) (*StateMachine, error) {
 
-	db, err := badger.Open(badger.DefaultOptions(cfg.Chain.BaseDir))
+	opts := badger.DefaultOptions(cfg.Chain.BaseDir)
+	opts.Compression = options.None
+	opts.MetricsEnabled = true
+
+	db, err := badger.Open(opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open badger directory %v", err)
 	}

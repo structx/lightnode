@@ -40,10 +40,10 @@ func (bc *Blocks) RegisterRoutesV1(r chi.Router) {
 
 	rr := chi.NewRouter()
 
-	rr.Get("/{blockHash}", bc.FetchByHash)
+	rr.Get(blockHashPath, bc.FetchByHash)
 	rr.Get("/", bc.PaginatePartials)
 
-	r.Mount("/blocks", rr)
+	r.Mount(blockPath, rr)
 }
 
 // BlockPayload

@@ -37,7 +37,7 @@ func (tx *Transactions) RegisterRoutesV1(r chi.Router) {
 	rr.Get("/{txHash}", tx.Fetch)
 	rr.Get("/", tx.Paginate)
 
-	r.Mount("/blocks/{blockHash}/transactions", rr)
+	r.Mount(transactionPath, rr)
 }
 
 // TxPayload
@@ -88,22 +88,22 @@ func (txc *Transactions) Fetch(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	bs := chi.URLParamFromCtx(ctx, "blockHash")
-	ts := chi.URLParamFromCtx(ctx, "txHash")
+	blockStr := chi.URLParamFromCtx(ctx, "blockHash")
+	txStr := chi.URLParamFromCtx(ctx, "txHash")
 
-	bh, err := hex.DecodeString(bs)
+	blockHash, err := hex.DecodeString(blockStr)
 	if err != nil {
 		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
 		return
 	}
 
-	th, err := hex.DecodeString(ts)
+	txHash, err := hex.DecodeString(txStr)
 	if err != nil {
 		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
 		return
 	}
 
-	tx, err := txc.ss.ReadTxByHash(ctx, bh, th)
+	tx, err := txc.ss.ReadTxByHash(ctx, blockHash, txHash)
 	if err != nil {
 		txc.log.Errorf("failed to read tx by hash %v", err)
 		_ = render.Render(w, r, pkgcontroller.ErrInternalServerError)

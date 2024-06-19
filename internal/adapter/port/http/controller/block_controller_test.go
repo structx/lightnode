@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/mock"
@@ -19,10 +18,6 @@ import (
 	"github.com/structx/lightnode/internal/core/domain"
 	"github.com/structx/lightnode/internal/core/domain/mocks"
 )
-
-func init() {
-	_ = os.Setenv("DSERVICE_CONFIG", "testfiles/controller.test.hcl")
-}
 
 type BlockControllerSuite struct {
 	suite.Suite
