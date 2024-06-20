@@ -11,6 +11,7 @@ import (
 	"sync"
 	"sync/atomic"
 
+	"github.com/golang/snappy"
 	"github.com/structx/lightnode/internal/core/setup"
 )
 
@@ -30,7 +31,7 @@ type LocalStore struct {
 // NewLocalStore
 func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 
-	path := filepath.Join(cfg.Chain.BaseDir, "chain_data.json")
+	path := filepath.Join(cfg.Chain.BaseDir, "chain_data.txt")
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
 	if err != nil {
 
@@ -106,12 +107,15 @@ func (ls *LocalStore) Put(key, value []byte) error {
 		return fmt.Errorf("unable to marshal record %v", err)
 	}
 
-	_, err = ls.file.Write(recordbytes)
+	compressed := snappy.Encode(nil, recordbytes)
+
+	ls.file.Seek(0, io.SeekEnd)
+	_, err = ls.file.WriteString(hex.EncodeToString(compressed) + "\n")
 	if err != nil {
 		return fmt.Errorf("failed to write to file %v", err)
 	}
 
-	ls.data.Store(hex.EncodeToString(key), value)
+	ls.data.Store(hex.EncodeToString(key), compressed)
 
 	ls.index.Add(1)
 
