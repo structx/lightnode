@@ -3,6 +3,7 @@ package store_test
 import (
 	"context"
 	"fmt"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,10 +21,16 @@ func TestPut(t *testing.T) {
 		stateMachine, err := store.NewLocalStore(cfg)
 		assert.NoError(err)
 
+		var wg sync.WaitGroup
+
 		for i := 0; i < 100; i++ {
-			err = stateMachine.Put([]byte(fmt.Sprintf("%d", i)), []byte(fmt.Sprintf("%d", i)))
-			assert.NoError(err)
+			wg.Add(1)
+			go func(index int) {
+				defer wg.Done()
+				stateMachine.Put([]byte(fmt.Sprintf("%d", index)), []byte(fmt.Sprintf("%d", index)))
+			}(i)
 		}
+		wg.Wait()
 
 		assert.NoError(stateMachine.Close())
 	})

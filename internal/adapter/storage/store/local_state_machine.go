@@ -1,6 +1,7 @@
 package store
 
 import (
+	"bytes"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -10,8 +11,10 @@ import (
 	"path/filepath"
 	"sync"
 	"sync/atomic"
+	"unicode/utf8"
 
 	"github.com/golang/snappy"
+
 	"github.com/structx/lightnode/internal/core/setup"
 )
 
@@ -93,6 +96,10 @@ func (ls *LocalStore) Get(key []byte) ([]byte, error) {
 // Put
 func (ls *LocalStore) Put(key, value []byte) error {
 
+	if bytes.Equal([]byte{}, key) || bytes.Equal([]byte{}, value) {
+		return errors.New("empty values provided")
+	}
+
 	_, ok := ls.data.Load(hex.EncodeToString(key))
 	if ok {
 		return &ErrKeyExists{Hash: hex.EncodeToString(key)}
@@ -108,9 +115,13 @@ func (ls *LocalStore) Put(key, value []byte) error {
 	}
 
 	compressed := snappy.Encode(nil, recordbytes)
+	written := utf8.EncodeRune(compressed, rune('\n'))
+	if written < 1 {
+		return errors.New("failed to encode escape character")
+	}
 
-	ls.file.Seek(0, io.SeekEnd)
-	_, err = ls.file.WriteString(hex.EncodeToString(compressed) + "\n")
+	ls.file.Seek(0, io.SeekStart)
+	_, err = ls.file.Write(compressed)
 	if err != nil {
 		return fmt.Errorf("failed to write to file %v", err)
 	}
