@@ -1,9 +1,9 @@
 package store
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/hex"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -11,18 +11,14 @@ import (
 	"path/filepath"
 	"sync"
 	"sync/atomic"
-	"unicode/utf8"
 
 	"github.com/golang/snappy"
 
-	"github.com/structx/lightnode/internal/core/setup"
-)
+	"google.golang.org/protobuf/proto"
 
-type record struct {
-	Index int64  `json:"index"`
-	Key   []byte `json:"key"`
-	Value []byte `json:"value"`
-}
+	"github.com/structx/lightnode/internal/core/setup"
+	pbv1 "github.com/structx/lightnode/proto/store/v1"
+)
 
 // LocalStore
 type LocalStore struct {
@@ -34,52 +30,46 @@ type LocalStore struct {
 // NewLocalStore
 func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 
-	path := filepath.Join(cfg.Chain.BaseDir, "chain_data.txt")
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, os.ModePerm)
+	path := filepath.Join(cfg.Chain.BaseDir, "chain_data")
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, os.ModePerm)
 	if err != nil {
-
-		if errors.Is(err, os.ErrExist) {
-			f, err = os.Open(path)
-			if err != nil {
-				return nil, fmt.Errorf("unable to open %s %v", path, err)
-			}
-
-			contents, err := io.ReadAll(f)
-			if err != nil {
-				return nil, fmt.Errorf("unable to read file contents %v", err)
-			}
-
-			var records []record
-			err = json.Unmarshal(contents, &records)
-			if err != nil {
-				return nil, fmt.Errorf("unable to unmarshal records %v", err)
-			}
-
-			ls := &LocalStore{}
-			ls.file = f
-			ls.data = sync.Map{}
-			ls.index = atomic.Int64{}
-			ls.index.Store(int64(len(records) - 1))
-
-			for _, r := range records {
-				ls.data.Store(r.Key, r.Value)
-			}
-
-			return ls, nil
-		}
-
-		return nil, fmt.Errorf("unable to create %s %v", path, err)
+		return nil, fmt.Errorf("unable to open %s %v", path, err)
 	}
 
-	ls := &LocalStore{}
-	ls.file = f
-	ls.data = sync.Map{}
-	ls.index = atomic.Int64{}
+	s := bufio.NewScanner(f)
 
-	return &LocalStore{
-		file: f,
-		data: sync.Map{},
-	}, nil
+	var index int64 = 0
+	ls := &LocalStore{}
+	ls.data = sync.Map{}
+
+	for s.Scan() {
+		line := s.Text()
+		buf, err := hex.DecodeString(line)
+		if err != nil {
+			return nil, fmt.Errorf("unable to decode line %v", err)
+		}
+
+		decompressed, err := snappy.Decode(nil, buf)
+		if err != nil {
+			return nil, fmt.Errorf("unable to decompress line %v", err)
+		}
+
+		var record pbv1.Record
+		err = proto.Unmarshal(decompressed, &record)
+		if err != nil {
+			return nil, fmt.Errorf("failed to unmarshal line %v", err)
+		}
+
+		ls.data.Store(record.Key, line)
+
+		index += 1
+	}
+
+	ls.file = f
+	ls.index = atomic.Int64{}
+	ls.index.Store(index)
+
+	return ls, nil
 }
 
 // Get
@@ -90,7 +80,23 @@ func (ls *LocalStore) Get(key []byte) ([]byte, error) {
 		return []byte{}, &ErrKeyNotFound{Hash: hex.EncodeToString(key)}
 	}
 
-	return value.([]byte), nil
+	decoded, err := hex.DecodeString(value.(string))
+	if err != nil {
+		return []byte{}, fmt.Errorf("unable to decode string %v", err)
+	}
+
+	decompressed, err := snappy.Decode(nil, decoded)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode message %v", err)
+	}
+
+	var record pbv1.Record
+	err = proto.Unmarshal(decompressed, &record)
+	if err != nil {
+		return []byte{}, fmt.Errorf("unable to unmarshal decode bytes %v", err)
+	}
+
+	return record.Value, nil
 }
 
 // Put
@@ -105,9 +111,8 @@ func (ls *LocalStore) Put(key, value []byte) error {
 		return &ErrKeyExists{Hash: hex.EncodeToString(key)}
 	}
 
-	recordbytes, err := json.Marshal(&record{
-		Index: ls.index.Load(),
-		Key:   key,
+	recordbytes, err := proto.Marshal(&pbv1.Record{
+		Key:   hex.EncodeToString(key),
 		Value: value,
 	})
 	if err != nil {
@@ -115,18 +120,15 @@ func (ls *LocalStore) Put(key, value []byte) error {
 	}
 
 	compressed := snappy.Encode(nil, recordbytes)
-	written := utf8.EncodeRune(compressed, rune('\n'))
-	if written < 1 {
-		return errors.New("failed to encode escape character")
-	}
+	compressedStr := hex.EncodeToString(compressed)
 
 	ls.file.Seek(0, io.SeekStart)
-	_, err = ls.file.Write(compressed)
+	_, err = ls.file.WriteString(compressedStr + "\n")
 	if err != nil {
-		return fmt.Errorf("failed to write to file %v", err)
+		return fmt.Errorf("unable to write to file %v", err)
 	}
 
-	ls.data.Store(hex.EncodeToString(key), compressed)
+	ls.data.Store(hex.EncodeToString(key), compressedStr)
 
 	ls.index.Add(1)
 

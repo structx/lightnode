@@ -1,6 +1,6 @@
 
 build:
-	docker build -t trevatk/lightnode:latest .
+	docker build -t structx/lightnode:latest .
 
 push:
 	docker push trevatk/lightnode:latest
@@ -15,5 +15,4 @@ lint:
 
 rpc:
 	protoc --go_out=. --go_opt=paths=source_relative \
-    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-    proto/raft/v1/raft_service.proto
+    proto/store/v1/local_store.proto

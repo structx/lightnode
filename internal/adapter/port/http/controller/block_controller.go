@@ -3,6 +3,7 @@ package controller
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -24,9 +25,6 @@ type Blocks struct {
 	service domain.SimpleService
 }
 
-// interface compliance
-var _ pkgcontroller.V1 = (*Blocks)(nil)
-
 // NewBlocks
 func NewBlocks(logger *zap.Logger, simple domain.SimpleService) *Blocks {
 	return &Blocks{
@@ -36,14 +34,9 @@ func NewBlocks(logger *zap.Logger, simple domain.SimpleService) *Blocks {
 }
 
 // RegisterRoutesV1
-func (bc *Blocks) RegisterRoutesV1(r chi.Router) {
-
-	rr := chi.NewRouter()
-
-	rr.Get(blockHashPath, bc.FetchByHash)
-	rr.Get("/", bc.PaginatePartials)
-
-	r.Mount(blockPath, rr)
+func (bc *Blocks) RegisterRoutesV1(mux *http.ServeMux) {
+	mux.HandleFunc("/api/v1/blocks/{blockHash}", bc.FetchByHash)
+	mux.HandleFunc("/api/v1/blocks", bc.PaginatePartials)
 }
 
 // BlockPayload
@@ -170,8 +163,6 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	bc.log.Debugf("PaginatePartials", "limit", limit, "offset", offset)
-
 	blockSlice, err := bc.service.PaginateBlocks(ctx, limit, offset)
 	if err != nil {
 		bc.log.Errorf("failed to paginate blocks %v", err)
@@ -179,5 +170,11 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = render.Render(w, r, NewPaginatePartialsResponse(blockSlice, start))
+	w.WriteHeader(http.StatusAccepted)
+	err = json.NewEncoder(w).Encode(NewPaginatePartialsResponse(blockSlice, start))
+	if err != nil {
+		bc.log.Errorf("unable to encode response %v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }

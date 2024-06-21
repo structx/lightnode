@@ -30,14 +30,9 @@ func NewTransactions(logger *zap.Logger, simpleService domain.SimpleService) *Tr
 }
 
 // RegisterRoutesV1 build controller handler from exposed endpoints
-func (tx *Transactions) RegisterRoutesV1(r chi.Router) {
-
-	rr := chi.NewRouter()
-
-	rr.Get("/{txHash}", tx.Fetch)
-	rr.Get("/", tx.Paginate)
-
-	r.Mount(transactionPath, rr)
+func (tx *Transactions) RegisterRoutesV1(mux *http.ServeMux) {
+	mux.HandleFunc(transactionPath, tx.Paginate)
+	mux.HandleFunc(transactionHashPath, tx.Fetch)
 }
 
 // TxPayload

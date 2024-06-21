@@ -1,11 +1,12 @@
 package serverfx
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/gorilla/handlers"
+)
 
 // NewHttp1Server
-func NewHttp1Server(handler http.Handler) *http.Server {
-	return &http.Server{
-		Addr:    ":8080",
-		Handler: handler,
-	}
+func InvokeHTTPServer(mux *http.ServeMux) {
+	http.ListenAndServe(":8080", handlers.CompressHandler(handlers.CORS()(mux)))
 }

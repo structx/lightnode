@@ -27,12 +27,12 @@ func main() {
 		fx.Provide(setup.NewConfig),
 		fx.Invoke(setup.ParseConfigFromEnv),
 		fx.Provide(logging.New),
-		fx.Provide(fx.Annotate(store.NewStateMachine, fx.As(new(domain.StateMachine)))),
+		fx.Provide(fx.Annotate(store.NewLocalStore, fx.As(new(domain.StateMachine)))),
 		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)))),
 		fx.Provide(fx.Annotate(service.NewSimpleService, fx.As(new(domain.SimpleService)))),
-		fx.Provide(fx.Annotate(routerfx.New, fx.As(new(http.Handler)))),
-		fx.Provide(serverfx.NewHttp1Server),
-		fx.Invoke(registerHooks),
+		fx.Provide(routerfx.New),
+		fx.Invoke(serverfx.InvokeHTTPServer),
+		// fx.Invoke(registerHooks),
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: logger}
 		}),

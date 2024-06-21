@@ -3,7 +3,7 @@ version: '3.7'
 
 services:
   lightnode:
-    image: trevatk/lightnode:latest
+    image: structx/lightnode:latest
     container_name: lightnode
     restart: 'no'
     ports:
@@ -15,3 +15,11 @@ services:
     volumes:
       - ./chain-data:/opt/lightnode/data
       - ./logs:/var/log/lightnode
+    deploy:
+      resources:
+        limits:
+          cpus: '1.00'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
