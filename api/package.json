@@ -1,0 +1,11 @@
+{
+  "name": "api",
+  "version": "0.1.0",
+  "type": "module",
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/json-schema": "^0.57.0",
+    "@typespec/openapi3": "^0.57.0"
+  },
+  "private": true
+}

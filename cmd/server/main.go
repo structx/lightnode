@@ -3,12 +3,9 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"net/http"
 
 	"go.uber.org/fx"
 	"go.uber.org/fx/fxevent"
-	"go.uber.org/multierr"
 	"go.uber.org/zap"
 
 	"github.com/structx/lightnode/internal/adapter/logging"
@@ -32,40 +29,8 @@ func main() {
 		fx.Provide(fx.Annotate(service.NewSimpleService, fx.As(new(domain.SimpleService)))),
 		fx.Provide(routerfx.New),
 		fx.Invoke(serverfx.InvokeHTTPServer),
-		// fx.Invoke(registerHooks),
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: logger}
 		}),
 	).Run()
-}
-
-func registerHooks(lc fx.Lifecycle, server *http.Server) error {
-	lc.Append(
-		fx.Hook{
-			OnStart: func(_ context.Context) error {
-
-				var result error
-
-				go func() {
-					if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-						result = multierr.Append(result, fmt.Errorf("failed to start http server %v", err))
-					}
-				}()
-
-				return result
-			},
-			OnStop: func(ctx context.Context) error {
-
-				var result error
-
-				err := server.Shutdown(ctx)
-				if err != nil {
-					result = multierr.Append(result, fmt.Errorf("failed to shutdown http server %v", err))
-				}
-
-				return result
-			},
-		},
-	)
-	return nil
 }

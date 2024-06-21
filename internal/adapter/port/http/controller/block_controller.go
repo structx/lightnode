@@ -136,14 +136,7 @@ func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *Pag
 	}
 }
 
-// Render
-func (ppr *PaginatePartialsResponse) Render(w http.ResponseWriter, _ *http.Request) error {
-	w.WriteHeader(http.StatusAccepted)
-	w.Header().Add("Content-Type", "application/json")
-	return nil
-}
-
-// PaginatePartials
+// PaginatePartials paginate partial blocks with limit and offset
 func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 
 	ctx := r.Context()

@@ -49,6 +49,19 @@ func BenchmarkAddTransaction(b *testing.B) {
 			Signatures:    []string{},
 			AccessCtrlRef: "",
 		})
+	}
+}
 
+func BenchmarkAddBlock(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		simpleChain.AddBlock(domain.Block{
+			Timestamp:     time.Now().String(),
+			Difficulty:    0,
+			Height:        1,
+			Transactions:  []*domain.Transaction{},
+			Data:          []byte(fmt.Sprintf("%x", i)),
+			AccessCtrlRef: "*",
+			AccessHash:    "",
+		})
 	}
 }

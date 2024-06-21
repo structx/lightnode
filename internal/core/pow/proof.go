@@ -25,7 +25,7 @@ func GenerateHash(b *domain.Block) {
 }
 
 func isValidHash(difficulty int, hash []byte) bool {
-	prefix := bytes.Repeat([]byte("0"), difficulty)
+	prefix := bytes.Repeat([]byte{0}, difficulty)
 	return bytes.HasPrefix(hash, prefix)
 }
 
