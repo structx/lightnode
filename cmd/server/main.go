@@ -28,7 +28,7 @@ func main() {
 		fx.Provide(fx.Annotate(chain.New, fx.As(new(domain.Chain)))),
 		fx.Provide(fx.Annotate(service.NewSimpleService, fx.As(new(domain.SimpleService)))),
 		fx.Provide(routerfx.New),
-		fx.Invoke(serverfx.InvokeHTTPServer),
+		fx.Invoke(serverfx.InvokeHTTPServer, serverfx.InvokePprof),
 		fx.WithLogger(func(logger *zap.Logger) fxevent.Logger {
 			return &fxevent.ZapLogger{Logger: logger}
 		}),

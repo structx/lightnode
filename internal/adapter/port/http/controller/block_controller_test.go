@@ -1,6 +1,7 @@
 package controller_test
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"net/http"
@@ -9,14 +10,17 @@ import (
 
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"go.uber.org/fx/fxtest"
 
-	"github.com/structx/go-dpkg/adapter/logging"
-	"github.com/structx/go-dpkg/adapter/setup"
-	"github.com/structx/go-dpkg/util/decode"
-
+	"github.com/structx/lightnode/internal/adapter/logging"
 	"github.com/structx/lightnode/internal/adapter/port/http/controller"
 	"github.com/structx/lightnode/internal/core/domain"
 	"github.com/structx/lightnode/internal/core/domain/mocks"
+	"github.com/structx/lightnode/internal/core/setup"
+)
+
+var (
+	lc *fxtest.Lifecycle
 )
 
 type BlockControllerSuite struct {
@@ -28,10 +32,12 @@ func (suite *BlockControllerSuite) SetupTest() {
 
 	assert := suite.Assert()
 
-	cfg := setup.New()
-	assert.NoError(decode.ConfigFromEnv(cfg))
+	cfg := &setup.Config{Chain: &setup.Chain{BaseDir: "./testfiles/store"}, Logger: &setup.Logger{Level: "DEBUG", Path: "xyz"}}
+	assert.NoError(setup.ParseConfigFromEnv(context.TODO(), cfg))
 
-	logger, err := logging.New(cfg)
+	lc = fxtest.NewLifecycle(suite.T())
+
+	logger, err := logging.New(lc)
 	assert.NoError(err)
 
 	mockService := mocks.NewSimpleService(suite.T())

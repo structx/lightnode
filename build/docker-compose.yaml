@@ -8,6 +8,8 @@ services:
     restart: 'no'
     ports:
       - 9002:8080
+      - 6060:6060
+      - 8082:8082
     environment:
       - LOG_PATH=/var/log/lightnode/lightnode.log
       - LOG_LEVEL=DEBUG
