@@ -4,13 +4,14 @@ const (
 	base    = 10
 	bitSize = 64
 
-	v1 = "/api/v1"
+	v1 = "/1.0"
 
 	blockPath     = v1 + "/blocks"
-	blockHashPath = v1 + blockPath + "/{blockHash}"
+	blockHashPath = blockPath + "/{blockHash}"
 
 	transactionPath     = blockHashPath + "/tx"
 	transactionHashPath = transactionPath + "/{txHash}"
 
-	health = "/health"
+	health  = "/health"
+	metrics = "/metrics"
 )

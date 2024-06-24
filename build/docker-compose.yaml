@@ -2,9 +2,9 @@
 version: '3.7'
 
 services:
-  lightnode:
-    image: structx/lightnode:latest
-    container_name: lightnode
+  olivia:
+    image: structx/olivia:latest
+    container_name: olivia
     restart: 'no'
     ports:
       - 9002:8080

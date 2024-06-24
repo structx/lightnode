@@ -3,7 +3,6 @@ package service
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"errors"
 	"fmt"
 
@@ -34,12 +33,7 @@ func (ss *SimpleService) ReadBlockByHash(ctx context.Context, hash string) (*dom
 		return nil, nil
 	default:
 
-		decodedHash, err := hex.DecodeString(hash)
-		if err != nil {
-			return nil, fmt.Errorf("failed to decode hash %v", err)
-		}
-
-		block, err := ss.ch.GetBlockByHash(decodedHash)
+		block, err := ss.ch.GetBlockByHash(hash)
 		if err != nil {
 
 			var notFound *chain.ErrResourceNotFound
@@ -97,7 +91,7 @@ func (ss *SimpleService) PaginateBlocks(ctx context.Context, limit, offset int64
 }
 
 // ReadTxByHash
-func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash []byte) (*domain.Transaction, error) {
+func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash string) (*domain.Transaction, error) {
 	select {
 	case <-ctx.Done():
 		return nil, nil
@@ -117,7 +111,7 @@ func (ss *SimpleService) ReadTxByHash(ctx context.Context, blockHash, txHash []b
 				return nil, ErrNotFound
 			}
 
-			if bytes.Equal(block.Hash, blockHash) {
+			if block.Hash == blockHash {
 				for _, tx := range block.Transactions {
 					// check if limit reached
 					if bytes.Equal(tx.ID, tx.ID) {

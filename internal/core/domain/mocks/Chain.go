@@ -113,7 +113,7 @@ func (_c *Chain_AddTransaction_Call) RunAndReturn(run func(*domain.Transaction) 
 }
 
 // GetBlockByHash provides a mock function with given fields: _a0
-func (_m *Chain) GetBlockByHash(_a0 []byte) (*domain.Block, error) {
+func (_m *Chain) GetBlockByHash(_a0 string) (*domain.Block, error) {
 	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
@@ -122,10 +122,10 @@ func (_m *Chain) GetBlockByHash(_a0 []byte) (*domain.Block, error) {
 
 	var r0 *domain.Block
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]byte) (*domain.Block, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) (*domain.Block, error)); ok {
 		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func([]byte) *domain.Block); ok {
+	if rf, ok := ret.Get(0).(func(string) *domain.Block); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
@@ -133,7 +133,7 @@ func (_m *Chain) GetBlockByHash(_a0 []byte) (*domain.Block, error) {
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func([]byte) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(_a0)
 	} else {
 		r1 = ret.Error(1)
@@ -148,14 +148,14 @@ type Chain_GetBlockByHash_Call struct {
 }
 
 // GetBlockByHash is a helper method to define mock.On call
-//   - _a0 []byte
+//   - _a0 string
 func (_e *Chain_Expecter) GetBlockByHash(_a0 interface{}) *Chain_GetBlockByHash_Call {
 	return &Chain_GetBlockByHash_Call{Call: _e.mock.On("GetBlockByHash", _a0)}
 }
 
-func (_c *Chain_GetBlockByHash_Call) Run(run func(_a0 []byte)) *Chain_GetBlockByHash_Call {
+func (_c *Chain_GetBlockByHash_Call) Run(run func(_a0 string)) *Chain_GetBlockByHash_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].([]byte))
+		run(args[0].(string))
 	})
 	return _c
 }
@@ -165,7 +165,7 @@ func (_c *Chain_GetBlockByHash_Call) Return(_a0 *domain.Block, _a1 error) *Chain
 	return _c
 }
 
-func (_c *Chain_GetBlockByHash_Call) RunAndReturn(run func([]byte) (*domain.Block, error)) *Chain_GetBlockByHash_Call {
+func (_c *Chain_GetBlockByHash_Call) RunAndReturn(run func(string) (*domain.Block, error)) *Chain_GetBlockByHash_Call {
 	_c.Call.Return(run)
 	return _c
 }

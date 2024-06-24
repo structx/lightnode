@@ -1,8 +1,9 @@
 package pow
 
 import (
-	"bytes"
+	"encoding/hex"
 	"fmt"
+	"strings"
 
 	"golang.org/x/crypto/sha3"
 
@@ -24,15 +25,15 @@ func GenerateHash(b *domain.Block) {
 	}
 }
 
-func isValidHash(difficulty int, hash []byte) bool {
-	prefix := bytes.Repeat([]byte{0}, difficulty)
-	return bytes.HasPrefix(hash, prefix)
+func isValidHash(difficulty int, hash string) bool {
+	prefix := strings.Repeat("0", difficulty)
+	return strings.HasPrefix(hash, prefix)
 }
 
-func computeHash(nounce, data string) []byte {
+func computeHash(nounce, data string) string {
 
 	h := sha3.New224()
 	h.Write([]byte(data + nounce))
 
-	return h.Sum(nil)
+	return hex.EncodeToString(h.Sum(nil))
 }

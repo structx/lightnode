@@ -63,7 +63,7 @@ func (_c *StateMachine_Close_Call) RunAndReturn(run func() error) *StateMachine_
 }
 
 // Get provides a mock function with given fields: key
-func (_m *StateMachine) Get(key []byte) ([]byte, error) {
+func (_m *StateMachine) Get(key string) ([]byte, error) {
 	ret := _m.Called(key)
 
 	if len(ret) == 0 {
@@ -72,10 +72,10 @@ func (_m *StateMachine) Get(key []byte) ([]byte, error) {
 
 	var r0 []byte
 	var r1 error
-	if rf, ok := ret.Get(0).(func([]byte) ([]byte, error)); ok {
+	if rf, ok := ret.Get(0).(func(string) ([]byte, error)); ok {
 		return rf(key)
 	}
-	if rf, ok := ret.Get(0).(func([]byte) []byte); ok {
+	if rf, ok := ret.Get(0).(func(string) []byte); ok {
 		r0 = rf(key)
 	} else {
 		if ret.Get(0) != nil {
@@ -83,7 +83,7 @@ func (_m *StateMachine) Get(key []byte) ([]byte, error) {
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func([]byte) error); ok {
+	if rf, ok := ret.Get(1).(func(string) error); ok {
 		r1 = rf(key)
 	} else {
 		r1 = ret.Error(1)
@@ -98,14 +98,14 @@ type StateMachine_Get_Call struct {
 }
 
 // Get is a helper method to define mock.On call
-//   - key []byte
+//   - key string
 func (_e *StateMachine_Expecter) Get(key interface{}) *StateMachine_Get_Call {
 	return &StateMachine_Get_Call{Call: _e.mock.On("Get", key)}
 }
 
-func (_c *StateMachine_Get_Call) Run(run func(key []byte)) *StateMachine_Get_Call {
+func (_c *StateMachine_Get_Call) Run(run func(key string)) *StateMachine_Get_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].([]byte))
+		run(args[0].(string))
 	})
 	return _c
 }
@@ -115,13 +115,13 @@ func (_c *StateMachine_Get_Call) Return(_a0 []byte, _a1 error) *StateMachine_Get
 	return _c
 }
 
-func (_c *StateMachine_Get_Call) RunAndReturn(run func([]byte) ([]byte, error)) *StateMachine_Get_Call {
+func (_c *StateMachine_Get_Call) RunAndReturn(run func(string) ([]byte, error)) *StateMachine_Get_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // Put provides a mock function with given fields: key, value
-func (_m *StateMachine) Put(key []byte, value []byte) error {
+func (_m *StateMachine) Put(key string, value []byte) error {
 	ret := _m.Called(key, value)
 
 	if len(ret) == 0 {
@@ -129,7 +129,7 @@ func (_m *StateMachine) Put(key []byte, value []byte) error {
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func([]byte, []byte) error); ok {
+	if rf, ok := ret.Get(0).(func(string, []byte) error); ok {
 		r0 = rf(key, value)
 	} else {
 		r0 = ret.Error(0)
@@ -144,15 +144,15 @@ type StateMachine_Put_Call struct {
 }
 
 // Put is a helper method to define mock.On call
-//   - key []byte
+//   - key string
 //   - value []byte
 func (_e *StateMachine_Expecter) Put(key interface{}, value interface{}) *StateMachine_Put_Call {
 	return &StateMachine_Put_Call{Call: _e.mock.On("Put", key, value)}
 }
 
-func (_c *StateMachine_Put_Call) Run(run func(key []byte, value []byte)) *StateMachine_Put_Call {
+func (_c *StateMachine_Put_Call) Run(run func(key string, value []byte)) *StateMachine_Put_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].([]byte), args[1].([]byte))
+		run(args[0].(string), args[1].([]byte))
 	})
 	return _c
 }
@@ -162,7 +162,7 @@ func (_c *StateMachine_Put_Call) Return(_a0 error) *StateMachine_Put_Call {
 	return _c
 }
 
-func (_c *StateMachine_Put_Call) RunAndReturn(run func([]byte, []byte) error) *StateMachine_Put_Call {
+func (_c *StateMachine_Put_Call) RunAndReturn(run func(string, []byte) error) *StateMachine_Put_Call {
 	_c.Call.Return(run)
 	return _c
 }

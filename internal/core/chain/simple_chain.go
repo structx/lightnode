@@ -29,7 +29,7 @@ type SimpleChain struct {
 	stateMachine domain.StateMachine
 
 	// volatile state
-	latestHash []byte
+	latestHash string
 	candidates sync.Map
 	height     atomic.Int64
 }
@@ -40,7 +40,7 @@ var _ domain.Chain = (*SimpleChain)(nil)
 // New constructor
 func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 
-	hash, err := stateMachine.Get([]byte(lastHash))
+	hash, err := stateMachine.Get(lastHash)
 	if err != nil {
 
 		var notFound *store.ErrKeyNotFound
@@ -65,7 +65,7 @@ func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 				Timestamp:     time.Now().Format(time.RFC3339Nano),
 				Height:        1,
 				Data:          []byte("genesis block"),
-				PrevHash:      []byte{},
+				PrevHash:      "",
 				Transactions:  []*domain.Transaction{coinTx},
 				AccessCtrlRef: "",
 				AccessHash:    "",
@@ -82,7 +82,7 @@ func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 				return nil, fmt.Errorf("failed to put genesis block %v", err)
 			}
 
-			err = stateMachine.Put([]byte(lastHash), gb.Hash)
+			err = stateMachine.Put(lastHash, []byte(gb.Hash))
 			if err != nil {
 				return nil, fmt.Errorf("unable to put last hash %v", err)
 			}
@@ -98,10 +98,11 @@ func New(stateMachine domain.StateMachine) (*SimpleChain, error) {
 
 			return chain, nil
 		}
+
 		return nil, fmt.Errorf("failed to get last hash %v", err)
 	}
 
-	blockbytes, err := stateMachine.Get(hash)
+	blockbytes, err := stateMachine.Get(hex.EncodeToString(hash))
 	if err != nil {
 		return nil, fmt.Errorf("unable to get last hash %v", err)
 	}
@@ -157,12 +158,12 @@ func (c *SimpleChain) AddBlock(block domain.Block) error {
 }
 
 // GetBlockByHash ...
-func (c *SimpleChain) GetBlockByHash(hash []byte) (*domain.Block, error) {
+func (c *SimpleChain) GetBlockByHash(hash string) (*domain.Block, error) {
 
 	blockbytes, err := c.stateMachine.Get(hash)
 	if err != nil {
 		if errors.Is(err, badger.ErrKeyNotFound) {
-			return nil, &ErrResourceNotFound{Hash: hex.EncodeToString(hash)}
+			return nil, &ErrResourceNotFound{Hash: hash}
 		}
 
 		return nil, fmt.Errorf("failed get block from store %v", err)
@@ -194,13 +195,13 @@ func (c *SimpleChain) AddTransaction(tx *domain.Transaction) error {
 			block, ok := value.(*domain.Block)
 			if ok {
 				// check if block from iter is correct
-				if !bytes.Equal(c.latestHash, block.PrevHash) {
+				if c.latestHash == block.PrevHash {
 					// next
 					return true
 				}
 
 				// update last hash
-				err := c.stateMachine.Put([]byte(lastHash), block.Hash)
+				err := c.stateMachine.Put(lastHash, []byte(block.Hash))
 				if err != nil {
 					return false
 				}
@@ -218,7 +219,7 @@ func (c *SimpleChain) AddTransaction(tx *domain.Transaction) error {
 		return c.AddTransaction(tx)
 	}
 
-	blockbytes, err := c.stateMachine.Get([]byte(c.latestHash))
+	blockbytes, err := c.stateMachine.Get(c.latestHash)
 	if err != nil {
 		return fmt.Errorf("unable to get block by latest hash %v", err)
 	}

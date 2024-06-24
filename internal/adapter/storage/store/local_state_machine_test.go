@@ -32,10 +32,10 @@ func (suite *LocalStateSuite) TestPut() {
 
 	assert := suite.Assert()
 
-	err := suite.stateMachine.Put([]byte("1"), []byte("1"))
+	err := suite.stateMachine.Put("1", []byte("1"))
 	assert.NoError(err)
 
-	err = suite.stateMachine.Put([]byte("2"), []byte("2"))
+	err = suite.stateMachine.Put("2", []byte("2"))
 	assert.NoError(err)
 }
 
@@ -43,10 +43,10 @@ func (suite *LocalStateSuite) TestGet() {
 
 	assert := suite.Assert()
 
-	// err := suite.stateMachine.Put([]byte("hello"), []byte("world"))
-	// assert.NoError(err)
+	err := suite.stateMachine.Put("hello", []byte("world"))
+	assert.NoError(err)
 
-	_, err := suite.stateMachine.Get([]byte("hello"))
+	_, err = suite.stateMachine.Get("hello")
 	assert.NoError(err)
 	defer suite.stateMachine.Close()
 

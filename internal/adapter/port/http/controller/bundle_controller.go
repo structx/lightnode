@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
@@ -21,6 +22,7 @@ func NewBundle(logger *zap.Logger) *Bundle {
 // RegisterRootRoutes
 func (bc *Bundle) RegisterRootRoutes(mux *http.ServeMux) {
 	mux.HandleFunc(health, bc.Health)
+	mux.Handle(metrics, promhttp.Handler())
 }
 
 // Health

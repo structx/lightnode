@@ -15,8 +15,10 @@ func New(logger *zap.Logger, simpleService domain.SimpleService) *http.ServeMux 
 
 	mux := http.NewServeMux()
 
-	controller.NewBundle(logger)
+	// service bundle endpoints
+	controller.NewBundle(logger).RegisterRootRoutes(mux)
 
+	// service endpoints
 	controller.NewBlocks(logger, simpleService).RegisterRoutesV1(mux)
 	controller.NewTransactions(logger, simpleService).RegisterRoutesV1(mux)
 

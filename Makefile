@@ -1,6 +1,6 @@
 
-build:
-	docker build -t structx/lightnode:latest .
+image:
+	docker build -t structx/olivia:latest .
 
 push:
 	docker push trevatk/lightnode:latest

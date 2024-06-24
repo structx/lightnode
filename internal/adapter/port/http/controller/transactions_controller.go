@@ -2,11 +2,11 @@ package controller
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
 	"go.uber.org/zap"
@@ -83,22 +83,10 @@ func (txc *Transactions) Fetch(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	blockStr := chi.URLParamFromCtx(ctx, "blockHash")
-	txStr := chi.URLParamFromCtx(ctx, "txHash")
+	blockStr := r.PathValue("blockHash")
+	txStr := r.PathValue("txHash")
 
-	blockHash, err := hex.DecodeString(blockStr)
-	if err != nil {
-		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
-		return
-	}
-
-	txHash, err := hex.DecodeString(txStr)
-	if err != nil {
-		_ = render.Render(w, r, pkgcontroller.ErrInvalidRequest(err))
-		return
-	}
-
-	tx, err := txc.ss.ReadTxByHash(ctx, blockHash, txHash)
+	tx, err := txc.ss.ReadTxByHash(ctx, blockStr, txStr)
 	if err != nil {
 		txc.log.Errorf("failed to read tx by hash %v", err)
 		_ = render.Render(w, r, pkgcontroller.ErrInternalServerError)
@@ -123,8 +111,7 @@ type PaginateTransactionsResponse struct {
 	Elapsed  int64                 `json:"elapsed"`
 }
 
-// NewPaginateTransactionsResponse
-func NewPaginateTransactionsResponse(s []*domain.PartialTransaction, start time.Time) *PaginateTransactionsResponse {
+func newPaginateTransactionsResponse(s []*domain.PartialTransaction, start time.Time) *PaginateTransactionsResponse {
 
 	txs := make([]*PartialTransaction, 0, len(s))
 
@@ -144,12 +131,6 @@ func NewPaginateTransactionsResponse(s []*domain.PartialTransaction, start time.
 	}
 }
 
-// Render
-func (ptr *PaginateTransactionsResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	w.WriteHeader(http.StatusAccepted)
-	return nil
-}
-
 // Paginate
 func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
 
@@ -157,7 +138,7 @@ func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
-	hashStr := chi.URLParamFromCtx(ctx, "blockHash")
+	hashStr := r.PathValue("blockHash")
 
 	limitStr := r.URL.Query().Get("limit")
 	offsetStr := r.URL.Query().Get("offset")
@@ -181,5 +162,9 @@ func (tx *Transactions) Paginate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = render.Render(w, r, NewPaginateTransactionsResponse(txs, start))
+	err = json.NewEncoder(w).Encode(newPaginateTransactionsResponse(txs, start))
+	if err != nil {
+		tx.log.Errorf("unable to encode response %v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }

@@ -11,7 +11,7 @@ type SimpleService interface {
 	// PaginateBlocks
 	PaginateBlocks(ctx context.Context, limit, offset int64) ([]*PartialBlock, error)
 	// ReadTxByHash
-	ReadTxByHash(ctx context.Context, blockHash, txHash []byte) (*Transaction, error)
+	ReadTxByHash(ctx context.Context, blockHash, txHash string) (*Transaction, error)
 	// PaginateTransactions
 	PaginateTransactions(ctx context.Context, hash string, limit, offset int64) ([]*PartialTransaction, error)
 }

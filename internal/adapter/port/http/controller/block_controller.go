@@ -2,14 +2,12 @@
 package controller
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
 
 	"go.uber.org/zap"
@@ -35,8 +33,8 @@ func NewBlocks(logger *zap.Logger, simple domain.SimpleService) *Blocks {
 
 // RegisterRoutesV1
 func (bc *Blocks) RegisterRoutesV1(mux *http.ServeMux) {
-	mux.HandleFunc("/api/v1/blocks/{blockHash}", bc.FetchByHash)
-	mux.HandleFunc("/api/v1/blocks", bc.PaginatePartials)
+	mux.HandleFunc(blockHashPath, bc.FetchByHash)
+	mux.HandleFunc(blockPath, bc.PaginatePartials)
 }
 
 // BlockPayload
@@ -55,12 +53,11 @@ type FetchByHashResponse struct {
 	Elapsed int64         `json:"elapsed"`
 }
 
-// NewFetchByHashResponse
-func NewFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashResponse {
+func newFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashResponse {
 	return &FetchByHashResponse{
 		Payload: &BlockPayload{
-			Hash:          hex.EncodeToString(block.Hash),
-			PrevHash:      hex.EncodeToString(block.PrevHash),
+			Hash:          block.Hash,
+			PrevHash:      block.PrevHash,
 			Timestamp:     block.Timestamp,
 			Height:        block.Height,
 			AccessCtrlRef: block.AccessCtrlRef,
@@ -70,19 +67,13 @@ func NewFetchByHashResponse(block *domain.Block, start time.Time) *FetchByHashRe
 	}
 }
 
-// Render
-func (fr *FetchByHashResponse) Render(w http.ResponseWriter, r *http.Request) error {
-	w.WriteHeader(http.StatusAccepted)
-	return nil
-}
-
 // FetchByHash
 func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 
 	start := time.Now()
 
 	ctx := r.Context()
-	hashStr := chi.URLParamFromCtx(ctx, "blockHash")
+	hashStr := r.PathValue("blockHash")
 
 	bc.log.Debugw("FetchByHash", "hash", hashStr)
 
@@ -98,8 +89,12 @@ func (bc *Blocks) FetchByHash(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := NewFetchByHashResponse(block, start)
-	_ = render.Render(w, r, response)
+	w.WriteHeader(http.StatusAccepted)
+	err = json.NewEncoder(w).Encode(newFetchByHashResponse(block, start))
+	if err != nil {
+		bc.log.Errorf("unable to code response %v", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
 
 // BlockPartial
@@ -116,15 +111,14 @@ type PaginatePartialsResponse struct {
 	Elapsed int64           `json:"elapsed"`
 }
 
-// NewPaginatePartialsResponse
-func NewPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *PaginatePartialsResponse {
+func newPaginatePartialsResponse(s []*domain.PartialBlock, start time.Time) *PaginatePartialsResponse {
 
 	bs := make([]*BlockPartial, 0, len(s))
 
 	for _, b := range s {
 		bs = append(bs, &BlockPartial{
-			Hash:      hex.EncodeToString(b.Hash),
-			PrevHash:  hex.EncodeToString(b.PrevHash),
+			Hash:      b.Hash,
+			PrevHash:  b.PrevHash,
 			Height:    b.Height,
 			Timestamp: b.Timestamp,
 		})
@@ -164,7 +158,7 @@ func (bc *Blocks) PaginatePartials(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusAccepted)
-	err = json.NewEncoder(w).Encode(NewPaginatePartialsResponse(blockSlice, start))
+	err = json.NewEncoder(w).Encode(newPaginatePartialsResponse(blockSlice, start))
 	if err != nil {
 		bc.log.Errorf("unable to encode response %v", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

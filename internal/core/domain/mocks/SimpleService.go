@@ -203,7 +203,7 @@ func (_c *SimpleService_ReadBlockByHash_Call) RunAndReturn(run func(context.Cont
 }
 
 // ReadTxByHash provides a mock function with given fields: ctx, blockHash, txHash
-func (_m *SimpleService) ReadTxByHash(ctx context.Context, blockHash []byte, txHash []byte) (*domain.Transaction, error) {
+func (_m *SimpleService) ReadTxByHash(ctx context.Context, blockHash string, txHash string) (*domain.Transaction, error) {
 	ret := _m.Called(ctx, blockHash, txHash)
 
 	if len(ret) == 0 {
@@ -212,10 +212,10 @@ func (_m *SimpleService) ReadTxByHash(ctx context.Context, blockHash []byte, txH
 
 	var r0 *domain.Transaction
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, []byte, []byte) (*domain.Transaction, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*domain.Transaction, error)); ok {
 		return rf(ctx, blockHash, txHash)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, []byte, []byte) *domain.Transaction); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *domain.Transaction); ok {
 		r0 = rf(ctx, blockHash, txHash)
 	} else {
 		if ret.Get(0) != nil {
@@ -223,7 +223,7 @@ func (_m *SimpleService) ReadTxByHash(ctx context.Context, blockHash []byte, txH
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, []byte, []byte) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) error); ok {
 		r1 = rf(ctx, blockHash, txHash)
 	} else {
 		r1 = ret.Error(1)
@@ -239,15 +239,15 @@ type SimpleService_ReadTxByHash_Call struct {
 
 // ReadTxByHash is a helper method to define mock.On call
 //   - ctx context.Context
-//   - blockHash []byte
-//   - txHash []byte
+//   - blockHash string
+//   - txHash string
 func (_e *SimpleService_Expecter) ReadTxByHash(ctx interface{}, blockHash interface{}, txHash interface{}) *SimpleService_ReadTxByHash_Call {
 	return &SimpleService_ReadTxByHash_Call{Call: _e.mock.On("ReadTxByHash", ctx, blockHash, txHash)}
 }
 
-func (_c *SimpleService_ReadTxByHash_Call) Run(run func(ctx context.Context, blockHash []byte, txHash []byte)) *SimpleService_ReadTxByHash_Call {
+func (_c *SimpleService_ReadTxByHash_Call) Run(run func(ctx context.Context, blockHash string, txHash string)) *SimpleService_ReadTxByHash_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].([]byte), args[2].([]byte))
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
 	return _c
 }
@@ -257,7 +257,7 @@ func (_c *SimpleService_ReadTxByHash_Call) Return(_a0 *domain.Transaction, _a1 e
 	return _c
 }
 
-func (_c *SimpleService_ReadTxByHash_Call) RunAndReturn(run func(context.Context, []byte, []byte) (*domain.Transaction, error)) *SimpleService_ReadTxByHash_Call {
+func (_c *SimpleService_ReadTxByHash_Call) RunAndReturn(run func(context.Context, string, string) (*domain.Transaction, error)) *SimpleService_ReadTxByHash_Call {
 	_c.Call.Return(run)
 	return _c
 }

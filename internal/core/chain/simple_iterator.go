@@ -1,7 +1,6 @@
 package chain
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -10,7 +9,7 @@ import (
 
 // SimpleIterator
 type SimpleIterator struct {
-	lastHash     []byte
+	lastHash     string
 	stateMachine domain.StateMachine
 }
 
@@ -18,15 +17,14 @@ type SimpleIterator struct {
 func (sc *SimpleChain) NewSimpleIterator() domain.Iterator {
 	return &SimpleIterator{
 		stateMachine: sc.stateMachine,
-		lastHash:     []byte(sc.latestHash),
+		lastHash:     sc.latestHash,
 	}
 }
 
 // Next
 func (si *SimpleIterator) Next() (*domain.Block, error) {
 
-	if bytes.Equal(si.lastHash, []byte{}) {
-		si.lastHash = []byte{}
+	if si.lastHash == "" {
 		return nil, nil
 	}
 
@@ -43,9 +41,7 @@ func (si *SimpleIterator) Next() (*domain.Block, error) {
 		return nil, fmt.Errorf("failed to unmarshal block from state machine %v", err)
 	}
 
-	if bytes.Equal(b.PrevHash, []byte{}) {
-		si.lastHash = []byte{}
-	}
+	si.lastHash = b.PrevHash
 
 	return &b, nil
 }

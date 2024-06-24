@@ -31,7 +31,7 @@ type Chain interface {
 	// AddBlock to chain
 	AddBlock(Block) error
 	// GetBlockByHash retrieve block by hash
-	GetBlockByHash([]byte) (*Block, error)
+	GetBlockByHash(string) (*Block, error)
 	// AddTransaction add transaction to block
 	AddTransaction(*Transaction) error
 	// Iter
@@ -45,8 +45,8 @@ type Iterator interface {
 
 // Block model
 type Block struct {
-	Hash          []byte         `json:"hash"`
-	PrevHash      []byte         `json:"prev_hash"`
+	Hash          string         `json:"hash"`
+	PrevHash      string         `json:"prev_hash"`
 	Timestamp     string         `json:"timestamp"`
 	Difficulty    int            `json:"difficulty"`
 	Data          []byte         `json:"data"`
@@ -58,8 +58,8 @@ type Block struct {
 
 // PartialBlock
 type PartialBlock struct {
-	Hash      []byte
-	PrevHash  []byte
+	Hash      string
+	PrevHash  string
 	Timestamp string
 	Height    int
 }

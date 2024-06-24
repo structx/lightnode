@@ -27,7 +27,7 @@ func TestPut(t *testing.T) {
 			wg.Add(1)
 			go func(index int) {
 				defer wg.Done()
-				stateMachine.Put([]byte(fmt.Sprintf("%d", index)), []byte(fmt.Sprintf("%d", index)))
+				stateMachine.Put(fmt.Sprintf("%d", index), []byte(fmt.Sprintf("%d", index)))
 			}(i)
 		}
 		wg.Wait()

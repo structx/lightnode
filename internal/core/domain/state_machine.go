@@ -4,7 +4,7 @@ package domain
 //
 //go:generate mockery --name StateMachine
 type StateMachine interface {
-	Get(key []byte) ([]byte, error)
-	Put(key, value []byte) error
+	Get(key string) ([]byte, error)
+	Put(key string, value []byte) error
 	Close() error
 }

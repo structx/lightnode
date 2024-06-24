@@ -1,7 +1,6 @@
 package pow_test
 
 import (
-	"encoding/hex"
 	"fmt"
 	"testing"
 	"time"
@@ -22,6 +21,6 @@ func TestGenerateHash(t *testing.T) {
 			AccessHash:    "",
 		}
 		pow.GenerateHash(b)
-		fmt.Println(hex.EncodeToString(b.Hash)) // 000000292e1c33aac0b37180d9cd7862f8c1241524d4fea482e9a039
+		fmt.Println(b.Hash) // 000000292e1c33aac0b37180d9cd7862f8c1241524d4fea482e9a039
 	})
 }

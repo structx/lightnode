@@ -16,6 +16,7 @@ import (
 
 	"google.golang.org/protobuf/proto"
 
+	"github.com/structx/lightnode/internal/core/domain"
 	"github.com/structx/lightnode/internal/core/setup"
 	pbv1 "github.com/structx/lightnode/proto/store/v1"
 )
@@ -27,6 +28,9 @@ type LocalStore struct {
 	data  sync.Map
 }
 
+// interface compliance
+var _ domain.StateMachine = (*LocalStore)(nil)
+
 // NewLocalStore
 func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 
@@ -37,13 +41,29 @@ func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 	}
 
 	s := bufio.NewScanner(f)
+	s.Split(bufio.ScanLines)
 
 	var index int64 = 0
-	ls := &LocalStore{}
-	ls.data = sync.Map{}
+	ls := &LocalStore{
+		data: sync.Map{},
+		file: f,
+	}
 
 	for s.Scan() {
+
+		err := s.Err()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			return nil, fmt.Errorf("unable to scan line %v", err)
+		}
+
 		line := s.Text()
+		if line == "" {
+			break
+		}
+
 		buf, err := hex.DecodeString(line)
 		if err != nil {
 			return nil, fmt.Errorf("unable to decode line %v", err)
@@ -65,7 +85,6 @@ func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 		index += 1
 	}
 
-	ls.file = f
 	ls.index = atomic.Int64{}
 	ls.index.Store(index)
 
@@ -73,19 +92,14 @@ func NewLocalStore(cfg *setup.Config) (*LocalStore, error) {
 }
 
 // Get
-func (ls *LocalStore) Get(key []byte) ([]byte, error) {
+func (ls *LocalStore) Get(key string) ([]byte, error) {
 
-	value, ok := ls.data.Load(hex.EncodeToString(key))
-	if !ok {
-		return []byte{}, &ErrKeyNotFound{Hash: hex.EncodeToString(key)}
+	value, ok := ls.data.Load(key)
+	if !ok || value == nil {
+		return []byte{}, &ErrKeyNotFound{Hash: key}
 	}
 
-	decoded, err := hex.DecodeString(value.(string))
-	if err != nil {
-		return []byte{}, fmt.Errorf("unable to decode string %v", err)
-	}
-
-	decompressed, err := snappy.Decode(nil, decoded)
+	decompressed, err := snappy.Decode(nil, value.([]byte))
 	if err != nil {
 		return nil, fmt.Errorf("failed to decode message %v", err)
 	}
@@ -100,19 +114,14 @@ func (ls *LocalStore) Get(key []byte) ([]byte, error) {
 }
 
 // Put
-func (ls *LocalStore) Put(key, value []byte) error {
+func (ls *LocalStore) Put(key string, value []byte) error {
 
-	if bytes.Equal([]byte{}, key) || bytes.Equal([]byte{}, value) {
+	if key == "" || bytes.Equal([]byte{}, value) {
 		return errors.New("empty values provided")
 	}
 
-	_, ok := ls.data.Load(hex.EncodeToString(key))
-	if ok {
-		return &ErrKeyExists{Hash: hex.EncodeToString(key)}
-	}
-
 	recordbytes, err := proto.Marshal(&pbv1.Record{
-		Key:   hex.EncodeToString(key),
+		Key:   key,
 		Value: value,
 	})
 	if err != nil {
@@ -120,15 +129,14 @@ func (ls *LocalStore) Put(key, value []byte) error {
 	}
 
 	compressed := snappy.Encode(nil, recordbytes)
-	compressedStr := hex.EncodeToString(compressed)
 
 	ls.file.Seek(0, io.SeekStart)
-	_, err = ls.file.WriteString(compressedStr + "\n")
+	_, err = ls.file.WriteString(hex.EncodeToString(compressed) + "\n")
 	if err != nil {
 		return fmt.Errorf("unable to write to file %v", err)
 	}
 
-	ls.data.Store(hex.EncodeToString(key), compressedStr)
+	ls.data.Store(key, compressed)
 
 	ls.index.Add(1)
 
